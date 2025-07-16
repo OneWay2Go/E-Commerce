@@ -12,9 +12,7 @@
 
   <ItemGroup>
     <Folder Include="Models\DTOs\" />
-    <Folder Include="Interfaces\" />
     <Folder Include="Mappers\" />
-    <Folder Include="Extensions\" />
     <Folder Include="Validators\" />
   </ItemGroup>
 
