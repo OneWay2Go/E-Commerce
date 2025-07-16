@@ -1,0 +1,26 @@
+﻿using ECommerce.Domain.Enums;
+
+namespace ECommerce.Domain.Entities;
+
+public class Order
+{
+    public int Id { get; set; }
+
+    public int UserId { get; set; }
+
+    public string? CouponCode { get; set; } // For discount
+
+    public DateTime OrderDate { get; set; }
+
+    public Status Status { get; set; }
+
+    public double TotalAmount { get; set; }
+
+    public int PaymentId { get; set; }
+
+    public int ShippingAddressId { get; set; }
+
+    public string Notes { get; set; }
+
+    public bool IsDeleted { get; set; }
+}
