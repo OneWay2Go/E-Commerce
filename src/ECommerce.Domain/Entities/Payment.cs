@@ -17,4 +17,8 @@ public class Payment
     public double AmountPaid { get; set; }
 
     public DateTime PaidAt { get; set; }
+
+    // Navigation properties
+
+    public Order Order { get; set; }
 }

@@ -18,5 +18,11 @@ public class ShippingAddress
 
     public string PhoneNumber { get; set; }
 
-    public bool IsDeleted { get; set; }
+    public bool IsDeleted { get; set; } = false;
+
+    // Navigation properties
+
+    public User User { get; set; }
+
+    public ICollection<Order> Orders { get; set; }
 }

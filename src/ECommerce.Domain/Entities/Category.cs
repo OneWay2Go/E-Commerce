@@ -11,4 +11,8 @@ public class Category
     public int ParentId { get; set; }
 
     public bool IsDeleted { get; set; } = false;
+
+    // Navigation properties 
+
+    public ICollection<Product> Products { get; set; }
 }

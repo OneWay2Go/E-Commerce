@@ -7,4 +7,9 @@ public class Role
     public string Name { get; set; }
 
     public bool IsDeleted { get; set; } = false;
+
+    // Navigation properties
+
+    public ICollection<UserRole> UserRoles { get; set; }
+    public ICollection<RolePermission> RolePermissions { get; set; }
 }

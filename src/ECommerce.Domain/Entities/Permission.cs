@@ -7,4 +7,8 @@ public class Permission
     public string Name { get; set; }
 
     public bool IsDeleted { get; set; } = false;
+
+    // Navigation properties
+
+    public ICollection<RolePermission> RolePermissions { get; set; }
 }
