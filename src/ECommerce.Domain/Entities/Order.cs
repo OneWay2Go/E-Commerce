@@ -16,8 +16,6 @@ public class Order
 
     public double TotalAmount { get; set; }
 
-    public int PaymentId { get; set; }
-
     public int ShippingAddressId { get; set; }
 
     public string Notes { get; set; }
