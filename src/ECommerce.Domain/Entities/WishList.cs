@@ -10,5 +10,11 @@ public class WishList
 
     public DateTime AddedAt { get; set; }
 
-    public bool IsDeleted { get; set; }
+    public bool IsDeleted { get; set; } = false;
+
+    // Navigation properties
+
+    public User User { get; set; }
+
+    public Product Product { get; set; }
 }

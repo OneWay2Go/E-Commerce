@@ -7,4 +7,8 @@ public class Cart
     public int UserId { get; set; }
 
     public bool IsDeleted { get; set; } = false;
+
+    // Navigation properties
+
+    public ICollection<CartItem> CartItems { get; set; }
 }

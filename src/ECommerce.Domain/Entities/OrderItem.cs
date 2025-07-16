@@ -11,4 +11,10 @@ public class OrderItem
     public int Quantity { get; set; }
 
     public double Subtotal { get; set; } // Quantity * Price, Price can be brought by ProductId from Product
+
+    // Navigation Properties
+
+    public Order Order { get; set; }
+
+    public Product Product { get; set; }
 }

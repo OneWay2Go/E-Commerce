@@ -18,7 +18,11 @@ public class Coupon
 
     public DateOnly ValidTo { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public int UsageLimit { get; set; }
+
+    // Navigation properties
+
+    public ICollection<Order> Orders { get; set; }
 }

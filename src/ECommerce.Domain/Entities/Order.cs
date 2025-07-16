@@ -8,7 +8,7 @@ public class Order
 
     public int UserId { get; set; }
 
-    public string? CouponCode { get; set; } // For discount
+    public int? CouponId { get; set; } // For discount
 
     public DateTime OrderDate { get; set; }
 
@@ -16,11 +16,21 @@ public class Order
 
     public double TotalAmount { get; set; }
 
-    public int PaymentId { get; set; }
-
     public int ShippingAddressId { get; set; }
 
     public string Notes { get; set; }
 
-    public bool IsDeleted { get; set; }
+    public bool IsDeleted { get; set; } = false;
+
+    // Navigation properties
+
+    public User User { get; set; }
+
+    public ShippingAddress ShippingAddress { get; set; }
+
+    public Payment Payment { get; set; }
+
+    public ICollection<OrderItem> OrderItems { get; set; }
+
+    public Coupon Coupon { get; set; }
 }

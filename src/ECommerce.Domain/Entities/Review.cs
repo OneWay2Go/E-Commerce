@@ -14,5 +14,11 @@ public class Review
 
     public bool IsApproved { get; set; } // For moderation to check for bad words
 
-    public bool IsDeleted { get; set; }
+    public bool IsDeleted { get; set; } = false;
+
+    // Navigation properties
+
+    public User User { get; set; }
+
+    public Product Product { get; set; }
 }
