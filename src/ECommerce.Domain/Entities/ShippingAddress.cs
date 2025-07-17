@@ -1,4 +1,6 @@
-﻿namespace ECommerce.Domain.Entities;
+﻿using ECommerce.Domain.Entities.Auth;
+
+namespace ECommerce.Domain.Entities;
 
 public class ShippingAddress
 {

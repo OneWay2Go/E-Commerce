@@ -1,4 +1,5 @@
 ﻿using ECommerce.Domain.Entities;
+using ECommerce.Domain.Entities.Auth;
 using ECommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 

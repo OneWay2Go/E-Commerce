@@ -1,4 +1,4 @@
-﻿using ECommerce.Domain.Entities;
+﻿using ECommerce.Domain.Entities.Auth;
 
 namespace ECommerce.Application.Interfaces;
 

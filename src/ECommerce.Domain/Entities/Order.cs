@@ -1,4 +1,5 @@
-﻿using ECommerce.Domain.Enums;
+﻿using ECommerce.Domain.Entities.Auth;
+using ECommerce.Domain.Enums;
 
 namespace ECommerce.Domain.Entities;
 
