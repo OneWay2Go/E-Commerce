@@ -67,6 +67,7 @@ The following entities from ECommerce.Domain.Entities.Auth were excluded as requ
 - RolePermission
 - UserRole
 
+
 ## Dependency Injection Registration
 Added all new repositories to `src/ECommerce.Infrastructure/Extensions/DependencyInjection.cs`:
 
