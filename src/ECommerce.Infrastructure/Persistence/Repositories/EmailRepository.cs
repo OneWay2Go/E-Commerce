@@ -13,22 +13,22 @@ public class EmailRepository(ECommerceDbContext context, IUserRepository userRep
         {
             return "";
         }
-        return user.Code.ToString();
+        return user.ToString(); // user.Code.ToString()
     }
 
     public async Task<bool> IsEmailCodeValidAsync(string email, string code)
     {
         var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted);
 
-        if (user == null || user.IsEmailConfirmed)
-        {
-            return false;
-        }
+        //if (user == null || user.IsEmailConfirmed)
+        //{
+        //    return false;
+        //}
         
-        if (user.Code == code)
-        {
-            user.IsEmailConfirmed = true;
-        }
+        //if (user.Code == code)
+        //{
+        //    user.IsEmailConfirmed = true;
+        //}
 
         userRepository.Update(user);
         await context.SaveChangesAsync();

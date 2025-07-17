@@ -1,56 +1,53 @@
 ﻿using ECommerce.Application.Interfaces;
-using ECommerce.Application.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
 
 namespace ECommerce.Infrastructure.Services;
 
-public class EmailService
+public class EmailService(IEmailRepository emailRepository, IConfiguration config)
 {
-    private readonly EmailSettings _emailSettings;
-    private readonly IEmailRepository _email;
-    private readonly ILogger<EmailService> _logger;
+    public async Task<bool> SendEmailAsync(string to)
+    {
+        var from = config["EmailSettings:From"];
+        var smtpServer = config["EmailSettings:SmtpServer"];
+        var port = int.Parse(config["EmailSettings:Port"]);
+        var username = config["EmailSettings:Username"];
+        var password = config["EmailSettings:Password"];
 
-    public EmailService(IOptions<EmailSettings> emailOptions, IEmailRepository email, ILogger<EmailService> logger)
-    {
-        _emailSettings = emailOptions.Value;
-        _email = email;
-        _logger = logger;
-    }
-    public async Task<bool> SendEmailAsync(string email)
-    {
+        using var client = new SmtpClient(smtpServer, port)
+        {
+            Credentials = new NetworkCredential(username, password),
+            EnableSsl = true
+        };
+
+        var code = await emailRepository.GetEmailCodeAsync(to);
+        if(string.IsNullOrEmpty(code))
+        {
+            return false;
+        }
+
+        var message = new MailMessage(from, to)
+        {
+            Subject = "Your verification code for ECommerceApp",
+            Body = code.ToString(),
+            IsBodyHtml = true
+        };
+
         try
         {
-            var code = await _email.GetEmailCodeAsync(email);
-            if (string.IsNullOrEmpty(code))
-            {
-                return false;
-            }
-            MailMessage mail = new MailMessage();
-            SmtpClient smtp = new SmtpClient(_emailSettings.SmtpHost);
-
-            mail.From = new MailAddress(_emailSettings.From);
-            mail.To.Add(email);
-            mail.Subject = "Your verification Code :)";
-            mail.Body = GenerateBody(code);
-            mail.IsBodyHtml = true;
-
-            smtp.Port = _emailSettings.SmtpPort;
-            smtp.Credentials = new NetworkCredential(_emailSettings.From, _emailSettings.SmtpPass);
-            smtp.EnableSsl = true;
-
-            smtp.Send(mail);
+            await client.SendMailAsync(message);
             return true;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
-            _logger.LogError("Error: ", ex.Message);
+            Log.Logger.Error(ex, "Error sending code to: {email}", to);
             return false;
         }
     }
+
     private string GenerateBody(string otp)
     {
         var sb = new StringBuilder();

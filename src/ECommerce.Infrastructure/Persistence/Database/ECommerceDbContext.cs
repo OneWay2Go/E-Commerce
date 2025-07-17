@@ -54,11 +54,11 @@ public class ECommerceDbContext : DbContext
                 Email = "admin@example.com",
                 FullName = "Admin User",
                 IsDeleted = false,
-                IsEmailConfirmed = true,
+                //IsEmailConfirmed = true,
                 PasswordHash = hashedPassword,
                 PasswordSalt = salt,
                 PhoneNumber = "901101613",
-                Code = Guid.NewGuid().ToString()
+                //Code = Guid.NewGuid().ToString()
             }
         );
 

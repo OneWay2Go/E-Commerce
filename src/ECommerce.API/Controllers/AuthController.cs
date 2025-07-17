@@ -46,18 +46,18 @@ namespace ECommerce.API.Controllers
             }
         }
 
-        [HttpPost("confirm-email")]
-        public async Task<IActionResult> ConfirmEmail([FromQuery]string email, [FromBody]string code)
-        {
-            var response = await emailRepository.IsEmailCodeValidAsync(email, code);
-            if (response)
-            {
-                return Ok("Email confirmed successfully!");
-            }
-            else
-            {
-                return BadRequest("Email is already confirmed or code is invalid.");
-            }
-        }
+        //[HttpPost("confirm-email")]
+        //public async Task<IActionResult> ConfirmEmail([FromQuery]string email, [FromBody]string code)
+        //{
+        //    var response = await emailRepository.IsEmailCodeValidAsync(email, code);
+        //    if (response)
+        //    {
+        //        return Ok("Email confirmed successfully!");
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Email is already confirmed or code is invalid.");
+        //    }
+        //}
     }
 }

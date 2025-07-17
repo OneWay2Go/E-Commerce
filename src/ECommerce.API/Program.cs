@@ -23,7 +23,7 @@ builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection("JwtOptions"));
 
 builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("Email"));
+    builder.Configuration.GetSection("EmailSettings"));
 
 // use PermissionSeeder to seed permissions with ScopeProvider
 using (var serviceProvider = builder.Services.BuildServiceProvider())
