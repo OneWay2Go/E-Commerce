@@ -1,4 +1,5 @@
 using ECommerce.API.Extensions;
+using ECommerce.Application.Extensions;
 using ECommerce.Application.Models;
 using ECommerce.Infrastructure.Auth.Seeders;
 using ECommerce.Infrastructure.Extensions;
@@ -15,6 +16,7 @@ builder.Host.UseSerilog((ctx, config) =>
 
 // Add services to the container.
 builder.Services.AddApi(builder.Configuration)
+    .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.Configure<JwtOptions>(
