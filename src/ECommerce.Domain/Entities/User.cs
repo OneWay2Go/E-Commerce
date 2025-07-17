@@ -14,6 +14,8 @@ public class User
 
     public string PhoneNumber { get; set; }
 
+    public string Code { get; set; }
+
     public bool IsDeleted { get; set; } = false;
 
     public bool IsEmailConfirmed { get; set; } = false;

@@ -11,5 +11,5 @@ public interface IAuthService
 
     Task<string> GenerateJwtTokenAsync(string email);
 
-    Task<bool> ValidateJwtTokenAsync();
+    string GenerateRefreshToken();
 }

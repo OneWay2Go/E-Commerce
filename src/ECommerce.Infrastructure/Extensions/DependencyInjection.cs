@@ -5,12 +5,15 @@ using ECommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ECommerce.Application.Models;
+using ECommerce.Infrastructure.Auth.Seeders;
+using System.Threading.Tasks;
 
 namespace ECommerce.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static async Task<IServiceCollection> AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<ECommerceDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
@@ -24,6 +27,10 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, PasswordHasher>();
 
         services.AddScoped(typeof(IUserRoleRepository), typeof(UserRoleRepository));
+
+        services.AddScoped<IEmailRepository, EmailRepository>();
+
+        services.AddScoped<EmailService>();
 
         return services;
     }

@@ -1,6 +1,8 @@
 ﻿using ECommerce.Application.Models;
-using ECommerce.Infrastructure.Extensions;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -13,10 +15,34 @@ public static class DependencyInjection
         services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            // Add JWT Bearer auth to Swagger
+            options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                Description = "Enter JWT token in this format: Bearer {your token}"
+            });
 
-        // Integrate the infrastructure layer
-        services.AddInfrastructure(configuration);
+            options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            {
+                {
+                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    {
+                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        {
+                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
         var jwtOptions = configuration.GetSection("JwtOptions").Get<JwtOptions>();
 
@@ -35,7 +61,19 @@ public static class DependencyInjection
             };
         });
 
-        services.AddAuthorization();
+        // Register all permissions as authorization policies
+        services.AddAuthorization(options =>
+        {
+            foreach (var permission in Enum.GetValues<Permission>())
+            {
+                options.AddPolicy(permission.ToString(), policy =>
+                {
+                    policy.Requirements.Add(new PermissionRequirement(permission));
+                });
+            }
+        });
+
+        services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         return services;
     }

@@ -3,6 +3,7 @@ using System;
 using ECommerce.Infrastructure.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Infrastructure.Migrations
 {
     [DbContext(typeof(ECommerceDbContext))]
-    partial class ECommerceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250717113159_SuperAdminSeedDataChanged")]
+    partial class SuperAdminSeedDataChanged
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -459,10 +462,6 @@ namespace ECommerce.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -497,13 +496,12 @@ namespace ECommerce.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "45f386d4-8b56-4b4b-b717-01bcc044de0b",
                             Email = "admin@example.com",
                             FullName = "Admin User",
                             IsDeleted = false,
                             IsEmailConfirmed = true,
-                            PasswordHash = "sw18e0ajGQHyLtExB9eLX6xCsdxeGjxTxpgk2PJvfec=",
-                            PasswordSalt = "5d9acc28-36a4-42fe-b604-9c8b6ad89621",
+                            PasswordHash = "j3kMC9Ao/DRPde66UPlw8fzS69RSkWqSAk3eiYqAuLI=",
+                            PasswordSalt = "994b6515-08c3-4b9f-a225-286e19c28496",
                             PhoneNumber = "901101613"
                         });
                 });
