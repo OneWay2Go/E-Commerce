@@ -1,16 +1,15 @@
 ﻿using ECommerce.Application.Interfaces;
 using ECommerce.Application.Models;
 using ECommerce.Application.Models.DTOs;
-using ECommerce.Domain.Entities;
+using ECommerce.Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace ECommerce.Infrastructure.Services;
 

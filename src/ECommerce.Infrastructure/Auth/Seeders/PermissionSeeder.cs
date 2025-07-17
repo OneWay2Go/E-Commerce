@@ -1,4 +1,4 @@
-﻿using ECommerce.Domain.Entities;
+﻿using ECommerce.Domain.Entities.Auth;
 using ECommerce.Infrastructure.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

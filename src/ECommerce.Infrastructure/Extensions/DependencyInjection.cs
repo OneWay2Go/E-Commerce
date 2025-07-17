@@ -43,6 +43,10 @@ public static class DependencyInjection
         services.AddScoped<IShippingAddressRepository, ShippingAddressRepository>();
         services.AddScoped<IWishListRepository, WishListRepository>();
 
+        // Register Permission and RolePermission repositories
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
+        services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+
         services.AddScoped<EmailService>();
 
         return services;
