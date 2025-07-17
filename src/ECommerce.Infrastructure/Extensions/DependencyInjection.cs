@@ -1,4 +1,4 @@
-﻿using ECommerce.Application.Interfaces;
+using ECommerce.Application.Interfaces;
 using ECommerce.Infrastructure.Persistence.Database;
 using ECommerce.Infrastructure.Persistence.Repositories;
 using ECommerce.Infrastructure.Services;
@@ -29,6 +29,19 @@ public static class DependencyInjection
         services.AddScoped(typeof(IUserRoleRepository), typeof(UserRoleRepository));
 
         services.AddScoped<IEmailRepository, EmailRepository>();
+
+        // Non-Auth Entity Repositories
+        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<ICartItemRepository, CartItemRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICouponRepository, CouponRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IReviewRepository, ReviewRepository>();
+        services.AddScoped<IShippingAddressRepository, ShippingAddressRepository>();
+        services.AddScoped<IWishListRepository, WishListRepository>();
 
         services.AddScoped<EmailService>();
 

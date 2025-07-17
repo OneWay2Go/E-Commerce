@@ -67,8 +67,27 @@ The following entities from ECommerce.Domain.Entities.Auth were excluded as requ
 - RolePermission
 - UserRole
 
+## Dependency Injection Registration
+Added all new repositories to `src/ECommerce.Infrastructure/Extensions/DependencyInjection.cs`:
+
+```csharp
+// Non-Auth Entity Repositories
+services.AddScoped<ICartRepository, CartRepository>();
+services.AddScoped<ICartItemRepository, CartItemRepository>();
+services.AddScoped<ICategoryRepository, CategoryRepository>();
+services.AddScoped<ICouponRepository, CouponRepository>();
+services.AddScoped<IOrderRepository, OrderRepository>();
+services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+services.AddScoped<IPaymentRepository, PaymentRepository>();
+services.AddScoped<IProductRepository, ProductRepository>();
+services.AddScoped<IReviewRepository, ReviewRepository>();
+services.AddScoped<IShippingAddressRepository, ShippingAddressRepository>();
+services.AddScoped<IWishListRepository, WishListRepository>();
+```
+
 ## Notes
 - All repositories inherit from the base `IRepository<T>` interface and `Repository<T>` implementation
 - All repositories use primary constructor syntax (C# 12 feature)
 - All repositories follow the existing project patterns and naming conventions
-- The repositories are ready for dependency injection registration
+- All repositories have been registered for dependency injection with scoped lifetime
+- Ready for use throughout the application via constructor injection
