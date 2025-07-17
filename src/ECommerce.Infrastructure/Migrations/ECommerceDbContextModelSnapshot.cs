@@ -157,8 +157,8 @@ namespace ECommerce.Infrastructure.Migrations
                             Email = "admin@example.com",
                             FullName = "Admin User",
                             IsDeleted = false,
-                            PasswordHash = "bA6fwuSyVEjeambH2YK+IBlXPgE1QfQC8mi71reo3CY=",
-                            PasswordSalt = "87b8fd1a-0f0e-4f29-8293-cd3ce95efed8",
+                            PasswordHash = "FmIw5nInWhDN6lmTExm1c071sg6PDoK1MHwCo2L/PeI=",
+                            PasswordSalt = "73e844e3-d3c7-4442-89b0-9996f52eae9c",
                             PhoneNumber = "901101613"
                         });
                 });

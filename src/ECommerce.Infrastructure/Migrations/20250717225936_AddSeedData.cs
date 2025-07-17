@@ -5,7 +5,7 @@
 namespace ECommerce.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class SuperAdminSeedDataChanged : Migration
+    public partial class AddSeedData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +15,7 @@ namespace ECommerce.Infrastructure.Migrations
                 keyColumn: "Id",
                 keyValue: 1,
                 columns: new[] { "PasswordHash", "PasswordSalt" },
-                values: new object[] { "j3kMC9Ao/DRPde66UPlw8fzS69RSkWqSAk3eiYqAuLI=", "994b6515-08c3-4b9f-a225-286e19c28496" });
+                values: new object[] { "FmIw5nInWhDN6lmTExm1c071sg6PDoK1MHwCo2L/PeI=", "73e844e3-d3c7-4442-89b0-9996f52eae9c" });
         }
 
         /// <inheritdoc />
@@ -26,7 +26,7 @@ namespace ECommerce.Infrastructure.Migrations
                 keyColumn: "Id",
                 keyValue: 1,
                 columns: new[] { "PasswordHash", "PasswordSalt" },
-                values: new object[] { "rkEn0+eUY4G4WJco0H0rNtxthXZhxx+n+6P97k8tKc4=", "8c8cf1e7-c946-44f3-a3df-b4f6b1f1b33c" });
+                values: new object[] { "SzvRILEzLKYDubeN7aT2/M3c2CxQEZekHzrc462OSic=", "261a0d9d-8cd2-45bf-8ebb-032f9ed3ea36" });
         }
     }
 }
