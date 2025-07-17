@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class CategoryController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.Category_Create)]
     public async Task<ActionResult<ApiResult<CategoryDto>>> Create([FromBody] CategoryDto dto)
     {
         var entity = categoryMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class CategoryController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.Category_GetAll)]
     public ActionResult<ApiResult<IEnumerable<CategoryDto>>> GetAll()
     {
         var entities = categoryRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class CategoryController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.Category_GetById)]
     public async Task<ActionResult<ApiResult<CategoryDto>>> GetById(int id)
     {
         var entity = await categoryRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class CategoryController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.Category_Update)]
     public async Task<ActionResult<ApiResult<CategoryDto>>> Update(int id, [FromBody] CategoryDto dto)
     {
         var entity = await categoryRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class CategoryController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.Category_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await categoryRepository.GetByIdAsync(id);

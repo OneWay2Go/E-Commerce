@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class CartItemController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.CartItem_Create)]
     public async Task<ActionResult<ApiResult<CartItemDto>>> Create([FromBody] CartItemDto dto)
     {
         var entity = cartItemMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class CartItemController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.CartItem_GetAll)]
     public ActionResult<ApiResult<IEnumerable<CartItemDto>>> GetAll()
     {
         var entities = cartItemRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class CartItemController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.CartItem_GetById)]
     public async Task<ActionResult<ApiResult<CartItemDto>>> GetById(int id)
     {
         var entity = await cartItemRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class CartItemController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.CartItem_Update)]
     public async Task<ActionResult<ApiResult<CartItemDto>>> Update(int id, [FromBody] CartItemDto dto)
     {
         var entity = await cartItemRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class CartItemController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.CartItem_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await cartItemRepository.GetByIdAsync(id);

@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class UserController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.User_Create)]
     public async Task<ActionResult<ApiResult<UserDto>>> Create([FromBody] UserDto dto)
     {
         var entity = userMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class UserController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.User_GetAll)]
     public ActionResult<ApiResult<IEnumerable<UserDto>>> GetAll()
     {
         var entities = userRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class UserController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.User_GetById)]
     public async Task<ActionResult<ApiResult<UserDto>>> GetById(int id)
     {
         var entity = await userRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class UserController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.User_Update)]
     public async Task<ActionResult<ApiResult<UserDto>>> Update(int id, [FromBody] UserDto dto)
     {
         var entity = await userRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class UserController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.User_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await userRepository.GetByIdAsync(id);

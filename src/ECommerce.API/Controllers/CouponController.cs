@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class CouponController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.Coupon_Create)]
     public async Task<ActionResult<ApiResult<CouponDto>>> Create([FromBody] CouponDto dto)
     {
         var entity = couponMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class CouponController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.Coupon_GetAll)]
     public ActionResult<ApiResult<IEnumerable<CouponDto>>> GetAll()
     {
         var entities = couponRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class CouponController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.Coupon_GetById)]
     public async Task<ActionResult<ApiResult<CouponDto>>> GetById(int id)
     {
         var entity = await couponRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class CouponController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.Coupon_Update)]
     public async Task<ActionResult<ApiResult<CouponDto>>> Update(int id, [FromBody] CouponDto dto)
     {
         var entity = await couponRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class CouponController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.Coupon_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await couponRepository.GetByIdAsync(id);

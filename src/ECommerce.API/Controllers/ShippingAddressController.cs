@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class ShippingAddressController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.ShippingAddress_Create)]
     public async Task<ActionResult<ApiResult<ShippingAddressDto>>> Create([FromBody] ShippingAddressDto dto)
     {
         var entity = shippingAddressMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class ShippingAddressController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.ShippingAddress_GetAll)]
     public ActionResult<ApiResult<IEnumerable<ShippingAddressDto>>> GetAll()
     {
         var entities = shippingAddressRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class ShippingAddressController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.ShippingAddress_GetById)]
     public async Task<ActionResult<ApiResult<ShippingAddressDto>>> GetById(int id)
     {
         var entity = await shippingAddressRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class ShippingAddressController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.ShippingAddress_Update)]
     public async Task<ActionResult<ApiResult<ShippingAddressDto>>> Update(int id, [FromBody] ShippingAddressDto dto)
     {
         var entity = await shippingAddressRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class ShippingAddressController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.ShippingAddress_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await shippingAddressRepository.GetByIdAsync(id);

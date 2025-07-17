@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class ProductController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.Product_Create)]
     public async Task<ActionResult<ApiResult<ProductDto>>> Create([FromBody] ProductDto dto)
     {
         var entity = productMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class ProductController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.Product_GetAll)]
     public ActionResult<ApiResult<IEnumerable<ProductDto>>> GetAll()
     {
         var entities = productRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class ProductController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.Product_GetById)]
     public async Task<ActionResult<ApiResult<ProductDto>>> GetById(int id)
     {
         var entity = await productRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class ProductController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.Product_Update)]
     public async Task<ActionResult<ApiResult<ProductDto>>> Update(int id, [FromBody] ProductDto dto)
     {
         var entity = await productRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class ProductController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.Product_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await productRepository.GetByIdAsync(id);
