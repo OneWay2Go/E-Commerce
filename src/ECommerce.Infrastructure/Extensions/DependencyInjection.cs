@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ECommerce.Application.Models;
 using ECommerce.Infrastructure.Auth.Seeders;
+using ECommerce.Application.Mappers;
 using System.Threading.Tasks;
 
 namespace ECommerce.Infrastructure.Extensions;
@@ -46,6 +47,24 @@ public static class DependencyInjection
         // Register Permission and RolePermission repositories
         services.AddScoped<IPermissionRepository, PermissionRepository>();
         services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+
+        // Register Mappers
+        services.AddScoped<UserMapper>();
+        services.AddScoped<RoleMapper>();
+        services.AddScoped<UserRoleMapper>();
+        services.AddScoped<PermissionMapper>();
+        services.AddScoped<RolePermissionMapper>();
+        services.AddScoped<CartMapper>();
+        services.AddScoped<CartItemMapper>();
+        services.AddScoped<CategoryMapper>();
+        services.AddScoped<CouponMapper>();
+        services.AddScoped<OrderMapper>();
+        services.AddScoped<OrderItemMapper>();
+        services.AddScoped<PaymentMapper>();
+        services.AddScoped<ProductMapper>();
+        services.AddScoped<ReviewMapper>();
+        services.AddScoped<ShippingAddressMapper>();
+        services.AddScoped<WishListMapper>();
 
         services.AddScoped<EmailService>();
 
