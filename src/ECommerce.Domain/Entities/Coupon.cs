@@ -22,6 +22,8 @@ public class Coupon
 
     public int UsageLimit { get; set; }
 
+    public bool IsDeleted { get; set; } = false;
+
     // Navigation properties
 
     public ICollection<Order> Orders { get; set; }
