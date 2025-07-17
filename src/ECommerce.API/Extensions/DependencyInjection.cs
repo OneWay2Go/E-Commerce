@@ -1,5 +1,4 @@
 ﻿using ECommerce.Application.Models;
-using ECommerce.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -33,17 +32,14 @@ public static class DependencyInjection
                     {
                         Reference = new Microsoft.OpenApi.Models.OpenApiReference
                         {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Id = "Bearer"
                         }
                     },
                     Array.Empty<string>()
                 }
             });
         });
-
-        // Integrate the infrastructure layer
-        services.AddInfrastructure(configuration);
 
         var jwtOptions = configuration.GetSection("JwtOptions").Get<JwtOptions>();
 

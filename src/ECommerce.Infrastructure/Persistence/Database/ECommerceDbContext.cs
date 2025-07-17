@@ -56,7 +56,8 @@ public class ECommerceDbContext : DbContext
                 IsEmailConfirmed = true,
                 PasswordHash = hashedPassword,
                 PasswordSalt = salt,
-                PhoneNumber = "901101613"
+                PhoneNumber = "901101613",
+                Code = Guid.NewGuid().ToString()
             }
         );
 

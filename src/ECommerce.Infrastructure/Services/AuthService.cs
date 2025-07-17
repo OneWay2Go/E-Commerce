@@ -19,7 +19,8 @@ public class AuthService(
     IPasswordHasher passwordHasher,
     IRoleRepository roleRepository,
     IUserRoleRepository userRoleRepository,
-    IOptions<JwtOptions> jwtOptions) : IAuthService
+    IOptions<JwtOptions> jwtOptions,
+    EmailService emailService) : IAuthService
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
@@ -111,7 +112,7 @@ public class AuthService(
 
     public async Task<ApiResult<RegisterResponseDto>> RegisterAsync(RegisterRequestDto request)
     {
-        var existingUser = userRepository.GetByCondition(u => u.Email == request.Email);
+        var existingUser = await userRepository.GetByCondition(u => u.Email == request.Email).FirstOrDefaultAsync();
         if(existingUser != null)
         {
             return ApiResult<RegisterResponseDto>.Failure("User already exists.");
@@ -132,7 +133,8 @@ public class AuthService(
             PasswordSalt = salt,
             IsDeleted = false,
             IsEmailConfirmed = false,
-            PhoneNumber = request.PhoneNumber
+            PhoneNumber = request.PhoneNumber,
+            Code = Guid.NewGuid().ToString() // Generate a unique code for email confirmation
         };
 
         await userRepository.AddAsync(newUser);
@@ -151,6 +153,13 @@ public class AuthService(
         };
         await userRoleRepository.AddAsync(userRole);
         await userRoleRepository.SaveChangesAsync();
+
+        var response = await emailService.SendEmailAsync(newUser.Email);
+        if (!response)
+        {
+            return ApiResult<RegisterResponseDto>
+                .Failure("Failed to send confirmation email. Please try again later.");
+        }
 
         return ApiResult<RegisterResponseDto>.Success(new RegisterResponseDto
         {

@@ -18,6 +18,9 @@ builder.Services.AddApi(builder.Configuration)
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection("JwtOptions"));
 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("Email"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

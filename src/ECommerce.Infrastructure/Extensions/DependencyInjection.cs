@@ -26,6 +26,10 @@ public static class DependencyInjection
 
         services.AddScoped(typeof(IUserRoleRepository), typeof(UserRoleRepository));
 
+        services.AddScoped<IEmailRepository, EmailRepository>();
+
+        services.AddScoped<EmailService>();
+
         return services;
     }
 }
