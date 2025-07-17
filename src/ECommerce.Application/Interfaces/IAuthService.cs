@@ -1,14 +1,15 @@
 ﻿using ECommerce.Application.Models;
+using ECommerce.Application.Models.DTOs;
 
 namespace ECommerce.Application.Interfaces;
 
 public interface IAuthService
 {
-    Task<ApiResult<string>> RegisterAsync();
+    Task<ApiResult<RegisterResponseDto>> RegisterAsync(RegisterRequestDto request);
 
-    Task<ApiResult<string>> LoginAsync();
-    
-    void GenerateJwtTokenAsync();
+    Task<ApiResult<LoginResponseDto>> LoginAsync(LoginRequestDto request);
 
-    void ValidateJwtTokenAsync();
+    Task<string> GenerateJwtTokenAsync(string email);
+
+    Task<bool> ValidateJwtTokenAsync();
 }

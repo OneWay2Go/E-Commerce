@@ -2,6 +2,8 @@
 
 public class ApiResult<T>
 {
+    private ApiResult() { }
+
     private ApiResult(T data, bool succeeded, string errors)
     {
         Data = data;

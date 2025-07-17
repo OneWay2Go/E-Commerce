@@ -49,7 +49,8 @@ public class ECommerceDbContext : DbContext
                 FullName = "Admin User",
                 IsDeleted = false,
                 IsEmailConfirmed = true,
-                PasswordHash = "8c6976e5b5410415bde908bd4dee15dfb16a7a60a5a8e3c6d7a0b6c6f2e5c3cf",
+                PasswordHash = "rkEn0+eUY4G4WJco0H0rNtxthXZhxx+n+6P97k8tKc4=",
+                PasswordSalt = "8c8cf1e7-c946-44f3-a3df-b4f6b1f1b33c",
                 PhoneNumber = "901101613"
             }
         );
@@ -59,6 +60,12 @@ public class ECommerceDbContext : DbContext
             {
                 Id = 1,
                 Name = "Admin",
+                IsDeleted = false
+            },
+            new Role
+            {
+                Id = 2,
+                Name = "User",
                 IsDeleted = false
             }
         );

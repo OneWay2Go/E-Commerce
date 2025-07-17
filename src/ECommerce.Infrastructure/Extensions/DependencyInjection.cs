@@ -1,5 +1,6 @@
 ﻿using ECommerce.Application.Interfaces;
 using ECommerce.Infrastructure.Persistence.Database;
+using ECommerce.Infrastructure.Persistence.Repositories;
 using ECommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,14 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IAuthService, AuthService>();
+
+        services.AddScoped<IUserRepository, UserRepository>();
+
+        services.AddScoped<IRoleRepository, RoleRepository>();
+
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+        services.AddScoped(typeof(IUserRoleRepository), typeof(UserRoleRepository));
 
         return services;
     }
