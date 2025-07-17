@@ -45,7 +45,7 @@ public class AuthService(
                 claims.Add(new Claim("role", userRole.Role.Name));
                 foreach (var permission in userRole.Role.RolePermissions.Select(rp => rp.Permission))
                 {
-                    claims.Add(new Claim("permission", permission.Name));
+                    claims.Add(new Claim("permissions", permission.Name));
                 }
             }
         }

@@ -1,5 +1,8 @@
 ﻿using ECommerce.Application.Models;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -58,7 +61,19 @@ public static class DependencyInjection
             };
         });
 
-        services.AddAuthorization();
+        // Register all permissions as authorization policies
+        services.AddAuthorization(options =>
+        {
+            foreach (var permission in Enum.GetValues<Permission>())
+            {
+                options.AddPolicy(permission.ToString(), policy =>
+                {
+                    policy.Requirements.Add(new PermissionRequirement(permission));
+                });
+            }
+        });
+
+        services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         return services;
     }

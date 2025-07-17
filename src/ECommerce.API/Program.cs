@@ -1,6 +1,8 @@
 using ECommerce.API.Extensions;
 using ECommerce.Application.Models;
+using ECommerce.Infrastructure.Auth.Seeders;
 using ECommerce.Infrastructure.Extensions;
+using ECommerce.Infrastructure.Persistence.Database;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +22,14 @@ builder.Services.Configure<JwtOptions>(
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("Email"));
+
+// use PermissionSeeder to seed permissions with ScopeProvider
+using (var serviceProvider = builder.Services.BuildServiceProvider())
+{
+    var dbContext = serviceProvider.GetRequiredService<ECommerceDbContext>();
+    var permissionSeeder = new PermissionSeeder(dbContext);
+    await permissionSeeder.SeedAsync();
+}
 
 var app = builder.Build();
 
