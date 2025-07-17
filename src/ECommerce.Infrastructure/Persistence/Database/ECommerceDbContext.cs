@@ -1,4 +1,5 @@
 ﻿using ECommerce.Domain.Entities;
+using ECommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Infrastructure.Persistence.Database;
@@ -41,6 +42,10 @@ public class ECommerceDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var salt = Guid.NewGuid().ToString();
+        var passwordHasher = new PasswordHasher();
+        var hashedPassword = passwordHasher.Encrypt("adminadmin", salt);
+
         modelBuilder.Entity<User>().HasData(
             new User
             {
@@ -49,8 +54,8 @@ public class ECommerceDbContext : DbContext
                 FullName = "Admin User",
                 IsDeleted = false,
                 IsEmailConfirmed = true,
-                PasswordHash = "rkEn0+eUY4G4WJco0H0rNtxthXZhxx+n+6P97k8tKc4=",
-                PasswordSalt = "8c8cf1e7-c946-44f3-a3df-b4f6b1f1b33c",
+                PasswordHash = hashedPassword,
+                PasswordSalt = salt,
                 PhoneNumber = "901101613"
             }
         );
