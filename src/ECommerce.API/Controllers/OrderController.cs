@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class OrderController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.Order_Create)]
     public async Task<ActionResult<ApiResult<OrderDto>>> Create([FromBody] OrderDto dto)
     {
         var entity = orderMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class OrderController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.Order_GetAll)]
     public ActionResult<ApiResult<IEnumerable<OrderDto>>> GetAll()
     {
         var entities = orderRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class OrderController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.Order_GetById)]
     public async Task<ActionResult<ApiResult<OrderDto>>> GetById(int id)
     {
         var entity = await orderRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class OrderController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.Order_Update)]
     public async Task<ActionResult<ApiResult<OrderDto>>> Update(int id, [FromBody] OrderDto dto)
     {
         var entity = await orderRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class OrderController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.Order_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await orderRepository.GetByIdAsync(id);

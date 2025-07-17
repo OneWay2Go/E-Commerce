@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class PaymentController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.Payment_Create)]
     public async Task<ActionResult<ApiResult<PaymentDto>>> Create([FromBody] PaymentDto dto)
     {
         var entity = paymentMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class PaymentController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.Payment_GetAll)]
     public ActionResult<ApiResult<IEnumerable<PaymentDto>>> GetAll()
     {
         var entities = paymentRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class PaymentController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.Payment_GetById)]
     public async Task<ActionResult<ApiResult<PaymentDto>>> GetById(int id)
     {
         var entity = await paymentRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class PaymentController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.Payment_Update)]
     public async Task<ActionResult<ApiResult<PaymentDto>>> Update(int id, [FromBody] PaymentDto dto)
     {
         var entity = await paymentRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class PaymentController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.Payment_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await paymentRepository.GetByIdAsync(id);

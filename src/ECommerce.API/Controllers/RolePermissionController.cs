@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class RolePermissionController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.RolePermission_Create)]
     public async Task<ActionResult<ApiResult<RolePermissionDto>>> Create([FromBody] RolePermissionDto dto)
     {
         var entity = rolePermissionMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class RolePermissionController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.RolePermission_GetAll)]
     public ActionResult<ApiResult<IEnumerable<RolePermissionDto>>> GetAll()
     {
         var entities = rolePermissionRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class RolePermissionController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.RolePermission_GetById)]
     public async Task<ActionResult<ApiResult<RolePermissionDto>>> GetById(int id)
     {
         var entity = await rolePermissionRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class RolePermissionController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.RolePermission_Update)]
     public async Task<ActionResult<ApiResult<RolePermissionDto>>> Update(int id, [FromBody] RolePermissionDto dto)
     {
         var entity = await rolePermissionRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class RolePermissionController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.RolePermission_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await rolePermissionRepository.GetByIdAsync(id);

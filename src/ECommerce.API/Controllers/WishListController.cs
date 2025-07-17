@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class WishListController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.WishList_Create)]
     public async Task<ActionResult<ApiResult<WishListDto>>> Create([FromBody] WishListDto dto)
     {
         var entity = wishListMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class WishListController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.WishList_GetAll)]
     public ActionResult<ApiResult<IEnumerable<WishListDto>>> GetAll()
     {
         var entities = wishListRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class WishListController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.WishList_GetById)]
     public async Task<ActionResult<ApiResult<WishListDto>>> GetById(int id)
     {
         var entity = await wishListRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class WishListController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.WishList_Update)]
     public async Task<ActionResult<ApiResult<WishListDto>>> Update(int id, [FromBody] WishListDto dto)
     {
         var entity = await wishListRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class WishListController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.WishList_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await wishListRepository.GetByIdAsync(id);

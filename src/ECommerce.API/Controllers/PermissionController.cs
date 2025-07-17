@@ -3,6 +3,8 @@ using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Domain.Enums;
+using ECommerce.Infrastructure.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,6 +16,7 @@ public class PermissionController(
 ) : ControllerBase
 {
     [HttpPost]
+    [PermissionAuthorize(Permission.Permission_Create)]
     public async Task<ActionResult<ApiResult<PermissionDto>>> Create([FromBody] PermissionDto dto)
     {
         var entity = permissionMapper.ToEntity(dto);
@@ -24,6 +27,7 @@ public class PermissionController(
     }
 
     [HttpGet]
+    [PermissionAuthorize(Permission.Permission_GetAll)]
     public ActionResult<ApiResult<IEnumerable<PermissionDto>>> GetAll()
     {
         var entities = permissionRepository.GetAll().ToList();
@@ -32,6 +36,7 @@ public class PermissionController(
     }
 
     [HttpGet("{id}")]
+    [PermissionAuthorize(Permission.Permission_GetById)]
     public async Task<ActionResult<ApiResult<PermissionDto>>> GetById(int id)
     {
         var entity = await permissionRepository.GetByIdAsync(id);
@@ -42,6 +47,7 @@ public class PermissionController(
     }
 
     [HttpPut("{id}")]
+    [PermissionAuthorize(Permission.Permission_Update)]
     public async Task<ActionResult<ApiResult<PermissionDto>>> Update(int id, [FromBody] PermissionDto dto)
     {
         var entity = await permissionRepository.GetByIdAsync(id);
@@ -56,6 +62,7 @@ public class PermissionController(
     }
 
     [HttpDelete("{id}")]
+    [PermissionAuthorize(Permission.Permission_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await permissionRepository.GetByIdAsync(id);
