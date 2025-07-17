@@ -87,10 +87,10 @@ public class AuthService(
             return ApiResult<LoginResponseDto>.Failure("User not found or deleted.");
         }
 
-        if (!user.IsEmailConfirmed)
-        {
-            return ApiResult<LoginResponseDto>.Failure("Email not confirmed. Please check your email.");
-        }
+        //if (!user.IsEmailConfirmed)
+        //{
+        //    return ApiResult<LoginResponseDto>.Failure("Email not confirmed. Please check your email.");
+        //}
 
         if (!passwordHasher.Verify(user.PasswordHash, request.Password, user.PasswordSalt))
         {
@@ -131,9 +131,8 @@ public class AuthService(
             PasswordHash = hashedPassword,
             PasswordSalt = salt,
             IsDeleted = false,
-            IsEmailConfirmed = false,
-            PhoneNumber = request.PhoneNumber,
-            Code = Guid.NewGuid().ToString() // Generate a unique code for email confirmation
+            //IsEmailConfirmed = false,
+            PhoneNumber = request.PhoneNumber
         };
 
         await userRepository.AddAsync(newUser);
@@ -153,17 +152,17 @@ public class AuthService(
         await userRoleRepository.AddAsync(userRole);
         await userRoleRepository.SaveChangesAsync();
 
-        var response = await emailService.SendEmailAsync(newUser.Email);
-        if (!response)
-        {
-            return ApiResult<RegisterResponseDto>
-                .Failure("Failed to send confirmation email. Please try again later.");
-        }
+        //var response = await emailService.SendEmailAsync(newUser.Email);
+        //if (!response)
+        //{
+        //    return ApiResult<RegisterResponseDto>
+        //        .Failure("Failed to send confirmation email. Please try again later.");
+        //}
 
         return ApiResult<RegisterResponseDto>.Success(new RegisterResponseDto
         {
             Email = newUser.Email,
-            Message = "User registered successfully, chech your email to confirm your registration.",
+            Message = "User registered successfully.",
         });
     }
 }
