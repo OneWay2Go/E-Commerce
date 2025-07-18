@@ -44,6 +44,16 @@ public static class DependencyInjection
             });
         });
 
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAnyOrigin", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+            });
+        });
+
         var jwtOptions = configuration.GetSection("JwtOptions").Get<JwtOptions>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
