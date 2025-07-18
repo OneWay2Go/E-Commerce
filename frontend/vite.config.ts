@@ -12,10 +12,13 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    // Note: Since we're using direct API calls to the deployed backend,
+    // proxy is not needed, but keeping it for local development fallback
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://e-commerce-nr8a.onrender.com',
         changeOrigin: true,
+        secure: true,
       }
     }
   }

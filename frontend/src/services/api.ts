@@ -17,52 +17,68 @@ import {
 
 class ApiService {
   private api: AxiosInstance;
+  private authApi: AxiosInstance;
+  private baseURL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'https://e-commerce-nr8a.onrender.com';
 
   constructor() {
+    // Main API instance for /api/* endpoints
     this.api = axios.create({
-      baseURL: '/api',
+      baseURL: `${this.baseURL}/api`,
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    // Request interceptor to add auth token
-    this.api.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
+    // Separate instance for auth endpoints
+    this.authApi = axios.create({
+      baseURL: this.baseURL,
+      headers: {
+        'Content-Type': 'application/json',
       },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
+    });
 
-    // Response interceptor for error handling
-    this.api.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          // Handle unauthorized - redirect to login
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+    // Request interceptor to add auth token for both APIs
+    const addAuthInterceptor = (instance: AxiosInstance) => {
+      instance.interceptors.request.use(
+        (config) => {
+          const token = localStorage.getItem('accessToken');
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+          return config;
+        },
+        (error) => {
+          return Promise.reject(error);
         }
-        return Promise.reject(error);
-      }
-    );
+      );
+
+      // Response interceptor for error handling
+      instance.interceptors.response.use(
+        (response) => response,
+        (error) => {
+          if (error.response?.status === 401) {
+            // Handle unauthorized - redirect to login
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            window.location.href = '/login';
+          }
+          return Promise.reject(error);
+        }
+      );
+    };
+
+    addAuthInterceptor(this.api);
+    addAuthInterceptor(this.authApi);
   }
 
   // Authentication endpoints
   async login(credentials: LoginRequest): Promise<ApiResult<LoginResponse>> {
-    const response: AxiosResponse<ApiResult<LoginResponse>> = await this.api.post('/auth/login', credentials);
+    const response: AxiosResponse<ApiResult<LoginResponse>> = await this.authApi.post('/auth/login', credentials);
     return response.data;
   }
 
   async register(userData: RegisterRequest): Promise<ApiResult<RegisterResponse>> {
-    const response: AxiosResponse<ApiResult<RegisterResponse>> = await this.api.post('/auth/register', userData);
+    const response: AxiosResponse<ApiResult<RegisterResponse>> = await this.authApi.post('/auth/register', userData);
     return response.data;
   }
 

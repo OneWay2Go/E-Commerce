@@ -41,7 +41,7 @@ A modern, responsive e-commerce frontend built with React, TypeScript, and Tailw
 3. **Environment Setup**
    Create a `.env` file in the root directory:
    ```env
-   VITE_API_BASE_URL=http://localhost:5000/api
+   VITE_API_BASE_URL=https://e-commerce-nr8a.onrender.com/api
    VITE_APP_NAME=E-Commerce Store
    ```
 
@@ -54,6 +54,10 @@ A modern, responsive e-commerce frontend built with React, TypeScript, and Tailw
    ```bash
    npm run build
    ```
+
+The application will be available at `http://localhost:3000` and is configured to make API requests directly to the deployed .NET backend at `https://e-commerce-nr8a.onrender.com`.
+
+**Note**: If you encounter CORS (Cross-Origin Resource Sharing) issues during development, the backend may need to be configured to allow requests from `http://localhost:3000`. This is typically handled in the backend's Program.cs file by adding CORS services and middleware.
 
 ## 🏗️ Project Structure
 
@@ -91,7 +95,7 @@ The project uses Tailwind CSS for styling with:
 
 ## 🔧 API Integration
 
-The frontend integrates with a .NET Core backend API that provides:
+The frontend integrates with a deployed .NET Core backend API (https://e-commerce-nr8a.onrender.com) that provides:
 
 - **Authentication endpoints** (`/auth/login`, `/auth/register`)
 - **Product management** (`/api/product`)
