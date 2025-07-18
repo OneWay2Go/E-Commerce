@@ -1,6 +1,7 @@
 {
   "name": "ecommerce-frontend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Modern E-commerce Frontend",
   "main": "index.js",
   "scripts": {
