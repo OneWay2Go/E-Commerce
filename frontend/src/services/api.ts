@@ -18,7 +18,7 @@ import {
 class ApiService {
   private api: AxiosInstance;
   private authApi: AxiosInstance;
-  private baseURL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'https://e-commerce-nr8a.onrender.com';
+  private baseURL = 'https://e-commerce-nr8a.onrender.com';
 
   constructor() {
     // Main API instance for /api/* endpoints
