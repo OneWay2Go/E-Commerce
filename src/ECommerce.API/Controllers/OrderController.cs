@@ -84,7 +84,7 @@ public class OrderController(
     {
         var userId = authHelpers.GetCurrentUserId();
         if (userId == -1)
-            return Unauthorized();
+            return Unauthorized(ApiResult<IEnumerable<OrderDto>>.Failure("Unauthorized."));
 
         var orders = await orderRepository.GetAll()
             .Where(o => o.UserId == userId && !o.IsDeleted)

@@ -14,6 +14,7 @@ import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
 import AuthDemo from '@/components/AuthDemo';
 import ApiTest from '@/components/ApiTest';
+import AuthDebug from '@/components/AuthDebug';
 
 const NotFoundPage = () => (
   <div className="container mx-auto px-4 py-16 text-center">
@@ -48,6 +49,7 @@ const App: React.FC = () => {
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/auth-demo" element={<AuthDemo />} />
             <Route path="/api-test" element={<ApiTest />} />
+            <Route path="/auth-debug" element={<AuthDebug />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

@@ -46,12 +46,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 
+// Add custom request logging middleware
+app.UseMiddleware<RequestLoggingMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAnyOrigin");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Add global exception handler middleware AFTER authentication/authorization
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.MapControllers();
 

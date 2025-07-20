@@ -9,6 +9,7 @@ public static class DependencyInjection
     {
         // Register Mappers
         services.AddScoped<UserMapper>();
+        services.AddScoped<ProfileMapper>();
         services.AddScoped<RoleMapper>();
         services.AddScoped<UserRoleMapper>();
         services.AddScoped<PermissionMapper>();

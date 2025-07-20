@@ -3,18 +3,20 @@ import { useAuthStore } from '@/store/authStore';
 import { apiService } from '@/services/api';
 import { User } from '@/types';
 import { User as UserIcon, Mail, Phone, Save, Edit } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage: React.FC = () => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, handleUnauthorized } = useAuthStore();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: ''
+    fullName: '',
+    email: '',
+    phoneNumber: ''
   });
 
   useEffect(() => {
@@ -32,16 +34,21 @@ const ProfilePage: React.FC = () => {
       if (response.succeeded && response.data) {
         setProfile(response.data);
         setFormData({
-          firstName: response.data.firstName || '',
-          lastName: response.data.lastName || '',
-          email: response.data.email || ''
+          fullName: response.data.fullName || '',
+          email: response.data.email || '',
+          phoneNumber: response.data.phoneNumber || ''
         });
       } else {
         setError(response.errors || 'Failed to load profile');
       }
-    } catch (err) {
-      setError('Failed to load profile');
-      console.error('Error loading profile:', err);
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        handleUnauthorized();
+        navigate('/login');
+      } else {
+        setError('Failed to load profile');
+        console.error('Error loading profile:', err);
+      }
     } finally {
       setLoading(false);
     }
@@ -58,9 +65,14 @@ const ProfilePage: React.FC = () => {
       } else {
         setError(response.errors || 'Failed to update profile');
       }
-    } catch (err) {
-      setError('Failed to update profile');
-      console.error('Error updating profile:', err);
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        handleUnauthorized();
+        navigate('/login');
+      } else {
+        setError('Failed to update profile');
+        console.error('Error updating profile:', err);
+      }
     } finally {
       setSaving(false);
     }
@@ -69,9 +81,9 @@ const ProfilePage: React.FC = () => {
   const handleCancel = () => {
     if (profile) {
       setFormData({
-        firstName: profile.firstName || '',
-        lastName: profile.lastName || '',
-        email: profile.email || ''
+        fullName: profile.fullName || '',
+        email: profile.email || '',
+        phoneNumber: profile.phoneNumber || ''
       });
     }
     setIsEditing(false);
@@ -132,52 +144,34 @@ const ProfilePage: React.FC = () => {
           <div className="space-y-6">
             {/* Profile Picture */}
             <div className="flex items-center space-x-4">
-              <div className="h-20 w-20 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold">
-                {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {profile?.firstName} {profile?.lastName}
-                </h2>
+                          <div className="h-20 w-20 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-bold">
+              {profile?.fullName?.charAt(0)}
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {profile?.fullName}
+              </h2>
                 <p className="text-gray-600">Member since {new Date().getFullYear()}</p>
               </div>
             </div>
 
             {/* Form Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* First Name */}
+              {/* Full Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  First Name
+                  Full Name
                 </label>
                 {isEditing ? (
                   <input
                     type="text"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="Enter your first name"
+                    placeholder="Enter your full name"
                   />
                 ) : (
-                  <p className="text-gray-900">{profile?.firstName || 'Not provided'}</p>
-                )}
-              </div>
-
-              {/* Last Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="Enter your last name"
-                  />
-                ) : (
-                  <p className="text-gray-900">{profile?.lastName || 'Not provided'}</p>
+                  <p className="text-gray-900">{profile?.fullName || 'Not provided'}</p>
                 )}
               </div>
 

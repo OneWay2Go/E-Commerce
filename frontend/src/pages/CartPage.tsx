@@ -3,13 +3,15 @@ import { useAuthStore } from '@/store/authStore';
 import { apiService } from '@/services/api';
 import { CartItem, Product } from '@/types';
 import { Trash2, Minus, Plus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface CartItemWithProduct extends CartItem {
   product?: Product;
 }
 
 const CartPage: React.FC = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, handleUnauthorized } = useAuthStore();
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItemWithProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,9 +34,14 @@ const CartPage: React.FC = () => {
       } else {
         setError(response.errors || 'Failed to load cart');
       }
-    } catch (err) {
-      setError('Failed to load cart');
-      console.error('Error loading cart:', err);
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        handleUnauthorized();
+        navigate('/login');
+      } else {
+        setError('Failed to load cart');
+        console.error('Error loading cart:', err);
+      }
     } finally {
       setLoading(false);
     }

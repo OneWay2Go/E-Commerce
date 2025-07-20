@@ -59,10 +59,11 @@ class ApiService {
         (response) => response,
         (error) => {
           if (error.response?.status === 401) {
-            // Handle unauthorized - redirect to login
+            // Handle unauthorized - clear tokens but don't redirect
+            // Let the components handle the redirect
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            window.location.href = '/login';
+            // Don't redirect here - let the calling component handle it
           }
           return Promise.reject(error);
         }

@@ -50,9 +50,9 @@ export interface RegisterResponse {
 // User types
 export interface User {
   id: number;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
+  phoneNumber?: string;
 }
 
 // Cart types

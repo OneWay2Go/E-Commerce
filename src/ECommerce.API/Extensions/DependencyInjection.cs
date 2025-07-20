@@ -69,6 +69,35 @@ public static class DependencyInjection
                 ValidAudience = jwtOptions.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
             };
+
+            // Add event handlers for debugging
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    Console.WriteLine($"JWT Authentication Failed: {context.Exception.Message}");
+                    Console.WriteLine($"Exception Type: {context.Exception.GetType().Name}");
+                    Console.WriteLine($"Stack Trace: {context.Exception.StackTrace}");
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    Console.WriteLine($"JWT Token Validated for user: {context.Principal?.Identity?.Name}");
+                    Console.WriteLine($"Claims: {string.Join(", ", context.Principal?.Claims?.Select(c => $"{c.Type}: {c.Value}") ?? Array.Empty<string>())}");
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    Console.WriteLine($"JWT Challenge: {context.Error}, {context.ErrorDescription}");
+                    Console.WriteLine($"Challenge Context: {context.AuthenticateFailure?.Message}");
+                    return Task.CompletedTask;
+                },
+                OnMessageReceived = context =>
+                {
+                    Console.WriteLine($"JWT Message Received: {context.Token}");
+                    return Task.CompletedTask;
+                }
+            };
         });
 
         // Register all permissions as authorization policies

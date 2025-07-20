@@ -19,18 +19,27 @@ public class AuthService(
     IRoleRepository roleRepository,
     IUserRoleRepository userRoleRepository,
     IOptions<JwtOptions> jwtOptions,
-    EmailService emailService) : IAuthService
+    EmailService emailService,
+    ILoggingService loggingService) : IAuthService
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
     public async Task<string> GenerateJwtTokenAsync(string email)
     {
+        loggingService.LogInformation("Generating JWT token for email: {Email}", email);
+        
         var user = await userRepository.GetByCondition(u => u.Email == email)
             .Include(u => u.UserRoles)
             .ThenInclude(u => u.Role)
             .ThenInclude(x => x.RolePermissions)
             .ThenInclude(x => x.Permission)
             .FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            loggingService.LogWarning("User not found for email: {Email}", email);
+            throw new InvalidOperationException($"User not found for email: {email}");
+        }
 
         var claims = new List<Claim>
         {
@@ -50,7 +59,12 @@ public class AuthService(
             }
         }
 
+        loggingService.LogInformation("JWT Claims: {@Claims}", claims.Select(c => new { c.Type, c.Value }));
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
+        
+        loggingService.LogInformation("JWT Options: Issuer={Issuer}, Audience={Audience}, ExpirationMinutes={ExpirationMinutes}", 
+            _jwtOptions.Issuer, _jwtOptions.Audience, _jwtOptions.ExpirationMinutes);
 
         var jwtToken = new JwtSecurityToken(
             issuer: _jwtOptions.Issuer,
@@ -60,7 +74,10 @@ public class AuthService(
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        loggingService.LogInformation("JWT token generated successfully for user: {UserId}", user.Id);
+        
+        return token;
     }
 
     public string GenerateRefreshToken()
@@ -76,6 +93,8 @@ public class AuthService(
 
     public async Task<ApiResult<LoginResponseDto>> LoginAsync(LoginRequestDto request)
     {
+        loggingService.LogInformation("Login attempt for email: {Email}", request.Email);
+        
         var user = await userRepository.GetByCondition(u => u.Email == request.Email && !u.IsDeleted)
             .Include(u => u.UserRoles)
             .ThenInclude(u => u.Role)
@@ -85,8 +104,11 @@ public class AuthService(
 
         if (user == null)
         {
+            loggingService.LogWarning("Login failed: User not found or deleted for email: {Email}", request.Email);
             return ApiResult<LoginResponseDto>.Failure("User not found or deleted.");
         }
+
+        loggingService.LogInformation("User found for login: {UserId}, {FullName}", user.Id, user.FullName);
 
         //if (!user.IsEmailConfirmed)
         //{
@@ -95,12 +117,18 @@ public class AuthService(
 
         if (!passwordHasher.Verify(user.PasswordHash, request.Password, user.PasswordSalt))
         {
+            loggingService.LogWarning("Login failed: Invalid password for user: {UserId}", user.Id);
             return ApiResult<LoginResponseDto>.Failure("Invalid password.");
         }
+
+        loggingService.LogInformation("Password verified successfully for user: {UserId}", user.Id);
 
         var accessToken = await GenerateJwtTokenAsync(user.Email);
         var refreshToken = GenerateRefreshToken();
         var roles = user.UserRoles.Select(ur => ur.Role.Name).ToList();
+
+        loggingService.LogInformation("Login successful for user: {UserId}, Roles: {Roles}", user.Id, string.Join(", ", roles));
+        loggingService.LogAuthenticationEvent("Login", request.Email, true);
 
         return ApiResult<LoginResponseDto>.Success(new LoginResponseDto
         {

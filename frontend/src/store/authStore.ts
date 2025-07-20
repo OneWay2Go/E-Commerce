@@ -15,6 +15,8 @@ interface AuthState {
   logout: () => void;
   clearError: () => void;
   setUser: (user: User) => void;
+  handleUnauthorized: () => void;
+  initializeAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -41,8 +43,7 @@ export const useAuthStore = create<AuthState>()(
             // In a real app, you'd decode the JWT or fetch user info
             const mockUser: User = {
               id: 1,
-              firstName: credentials.email.split('@')[0], // Use email prefix as first name
-              lastName: '',
+              fullName: credentials.email.split('@')[0], // Use email prefix as full name
               email: credentials.email,
             };
             
@@ -102,12 +103,31 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
+      // Method to handle 401 errors
+      handleUnauthorized: () => {
+        apiService.clearAuthToken();
+        
+        set({
+          user: null,
+          isAuthenticated: false,
+          error: null,
+        });
+      },
+
       clearError: () => {
         set({ error: null });
       },
 
       setUser: (user: User) => {
         set({ user, isAuthenticated: true });
+      },
+
+      initializeAuth: () => {
+        const token = localStorage.getItem('accessToken');
+        if (token && !get().isAuthenticated) {
+          // If we have a token but not authenticated, try to restore auth state
+          set({ isAuthenticated: true });
+        }
       },
     }),
     {
