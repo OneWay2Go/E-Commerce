@@ -1,5 +1,4 @@
 using ECommerce.Application.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace ECommerce.Infrastructure.Extensions;

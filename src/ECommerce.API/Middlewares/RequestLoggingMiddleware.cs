@@ -1,6 +1,5 @@
 using ECommerce.Application.Interfaces;
 using System.Diagnostics;
-using System.Text;
 
 namespace ECommerce.API.Middlewares;
 

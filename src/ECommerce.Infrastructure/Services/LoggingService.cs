@@ -1,6 +1,5 @@
 using ECommerce.Application.Interfaces;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace ECommerce.Infrastructure.Services;
 

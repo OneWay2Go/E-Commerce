@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Logging;
-
 namespace ECommerce.Application.Interfaces;
 
 public interface ILoggingService

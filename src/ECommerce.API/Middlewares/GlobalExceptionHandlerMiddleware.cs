@@ -32,9 +32,8 @@ public class GlobalExceptionHandlerMiddleware
         context.Response.ContentType = "application/json";
         
         // Log the full exception details
-        _loggingService.LogError("Global exception handler caught: {ExceptionType} - {Message}", 
-            exception.GetType().Name, exception.Message);
-        _loggingService.LogError("Exception stack trace: {StackTrace}", exception.StackTrace);
+        _loggingService.LogError("Global exception handler caught: {ExceptionType} - {Message}", exception, exception.Message);
+        _loggingService.LogError("Exception stack trace: {StackTrace}", exception, exception.StackTrace);
         
         var response = new
         {
@@ -47,7 +46,7 @@ public class GlobalExceptionHandlerMiddleware
         {
             case UnauthorizedAccessException:
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                response = new { Success = false, Message = "Unauthorized access." };
+                response = new { Success = false, Message = "Unauthorized access.", Details = "No Details" };
                 _loggingService.LogWarning("Unauthorized access attempt: {Path}", context.Request.Path);
                 break;
 

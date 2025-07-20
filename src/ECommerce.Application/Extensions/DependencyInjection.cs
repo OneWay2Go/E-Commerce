@@ -1,3 +1,4 @@
+using ECommerce.Application.Interfaces;
 using ECommerce.Application.Mappers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<ReviewMapper>();
         services.AddScoped<ShippingAddressMapper>();
         services.AddScoped<WishListMapper>();
+
 
         return services;
     }
