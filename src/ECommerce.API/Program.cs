@@ -1,4 +1,5 @@
 using ECommerce.API.Extensions;
+using ECommerce.API.Middlewares;
 using ECommerce.Application.Extensions;
 using ECommerce.Application.Models;
 using ECommerce.Infrastructure.Auth.Seeders;

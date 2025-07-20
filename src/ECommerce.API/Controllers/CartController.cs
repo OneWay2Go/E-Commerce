@@ -86,63 +86,64 @@ public class CartController(
     public async Task<ActionResult<ApiResult<CartDto>>> GetMyCart()
     {
         loggingService.LogInformation("=== CART ENDPOINT CALLED ===");
-        loggingService.LogInformation("Request Headers: {@Headers}", 
+        loggingService.LogInformation("Request Headers: {@Headers}",
             Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()));
-    {
-        try
         {
-            var userId = authHelpers.GetCurrentUserId();
-            if (userId == -1)
+            try
             {
-                loggingService.LogWarning("Cart access attempted without valid user ID");
-                return Unauthorized(ApiResult<CartDto>.Failure("Unauthorized."));
-            }
-
-            loggingService.LogInformation("Fetching cart for user ID: {UserId}", userId);
-            var cart = await cartRepository.GetByCondition(c => c.UserId == userId)
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Product)
-                .FirstOrDefaultAsync();
-            if (cart == null)
-            {
-                loggingService.LogWarning("Cart not found for user ID: {UserId}", userId);
-                return NotFound(ApiResult<CartDto>.Failure("Cart not found."));
-            }
-
-            // Manual mapping to avoid Mapperly issues
-            var cartDto = new CartDto
-            {
-                Id = cart.Id,
-                UserId = cart.UserId,
-                CartItems = cart.CartItems?.Select(ci => new CartItemDto
+                var userId = authHelpers.GetCurrentUserId();
+                if (userId == -1)
                 {
-                    Id = ci.Id,
-                    CartId = ci.CartId,
-                    ProductId = ci.ProductId,
-                    Quantity = ci.Quantity,
-                    Product = ci.Product != null ? new ProductDto
+                    loggingService.LogWarning("Cart access attempted without valid user ID");
+                    return Unauthorized(ApiResult<CartDto>.Failure("Unauthorized."));
+                }
+
+                loggingService.LogInformation("Fetching cart for user ID: {UserId}", userId);
+                var cart = await cartRepository.GetByCondition(c => c.UserId == userId)
+                    .Include(c => c.CartItems)
+                    .ThenInclude(ci => ci.Product)
+                    .FirstOrDefaultAsync();
+                if (cart == null)
+                {
+                    loggingService.LogWarning("Cart not found for user ID: {UserId}", userId);
+                    return NotFound(ApiResult<CartDto>.Failure("Cart not found."));
+                }
+
+                // Manual mapping to avoid Mapperly issues
+                var cartDto = new CartDto
+                {
+                    Id = cart.Id,
+                    UserId = cart.UserId,
+                    CartItems = cart.CartItems?.Select(ci => new CartItemDto
                     {
-                        Id = ci.Product.Id,
-                        Name = ci.Product.Name,
-                        Description = ci.Product.Description,
-                        Price = ci.Product.Price,
-                        Stock = ci.Product.Stock,
-                        CategoryId = ci.Product.CategoryId
-                    } : null
-                }).ToList() ?? new List<CartItemDto>()
-            };
+                        Id = ci.Id,
+                        CartId = ci.CartId,
+                        ProductId = ci.ProductId,
+                        Quantity = ci.Quantity,
+                        Product = ci.Product != null ? new ProductDto
+                        {
+                            Id = ci.Product.Id,
+                            Name = ci.Product.Name,
+                            Description = ci.Product.Description,
+                            Price = ci.Product.Price,
+                            Stock = ci.Product.Stock,
+                            CategoryId = ci.Product.CategoryId
+                        } : null
+                    }).ToList() ?? new List<CartItemDto>()
+                };
 
-            loggingService.LogInformation("Cart retrieved successfully for user: {UserId}, Cart ID: {CartId}, Items: {ItemCount}", 
-                userId, cart.Id, cart.CartItems?.Count ?? 0);
-            loggingService.LogUserAction("Cart Retrieved", userId, $"Cart with {cart.CartItems?.Count ?? 0} items retrieved");
-            loggingService.LogDatabaseOperation("Select", "Cart", cart.Id);
+                loggingService.LogInformation("Cart retrieved successfully for user: {UserId}, Cart ID: {CartId}, Items: {ItemCount}",
+                    userId, cart.Id, cart.CartItems?.Count ?? 0);
+                loggingService.LogUserAction("Cart Retrieved", userId, $"Cart with {cart.CartItems?.Count ?? 0} items retrieved");
+                loggingService.LogDatabaseOperation("Select", "Cart", cart.Id);
 
-            return Ok(ApiResult<CartDto>.Success(cartDto));
-        }
-        catch (Exception ex)
-        {
-            loggingService.LogError("Error retrieving cart for user", ex);
-            return BadRequest(ApiResult<CartDto>.Failure($"Error: {ex.Message}"));
+                return Ok(ApiResult<CartDto>.Success(cartDto));
+            }
+            catch (Exception ex)
+            {
+                loggingService.LogError("Error retrieving cart for user", ex);
+                return BadRequest(ApiResult<CartDto>.Failure($"Error: {ex.Message}"));
+            }
         }
     }
-} 
+}

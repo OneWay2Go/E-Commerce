@@ -1,13 +1,13 @@
 using ECommerce.Application.Interfaces;
-using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
-using Microsoft.AspNetCore.Mvc;
-using ECommerce.Domain.Enums;
-using ECommerce.Infrastructure.Auth;
-using Microsoft.AspNetCore.Authorization;
-using ECommerce.Infrastructure.Auth.Helpers;
+using ECommerce.Application.Models.DTOs;
 using ECommerce.Domain.Entities.Auth;
+using ECommerce.Infrastructure.Auth;
+using ECommerce.Infrastructure.Auth.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -85,72 +85,48 @@ public class UserController(
     public async Task<ActionResult<ApiResult<ProfileDto>>> GetProfile()
     {
         loggingService.LogInformation("=== PROFILE ENDPOINT CALLED ===");
-        loggingService.LogInformation("Request Headers: {@Headers}", 
+        loggingService.LogInformation("Request Headers: {@Headers}",
             Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()));
-    {
-        try
         {
-            var userId = authHelpers.GetCurrentUserId();
-            if (userId == -1)
+            try
             {
-                loggingService.LogWarning("Profile access attempted without valid user ID");
-                return Unauthorized(ApiResult<ProfileDto>.Failure("Unauthorized."));
+                var userId = authHelpers.GetCurrentUserId();
+                if (userId == -1)
+                {
+                    loggingService.LogWarning("Profile access attempted without valid user ID");
+                    return Unauthorized(ApiResult<ProfileDto>.Failure("Unauthorized."));
+                }
+
+                loggingService.LogInformation("Fetching profile for user ID: {UserId}", userId);
+                var user = await userRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    loggingService.LogWarning("User with ID {UserId} not found in database", userId);
+                    return NotFound(ApiResult<ProfileDto>.Failure("User not found."));
+                }
+
+                // Manual mapping to avoid Mapperly issues
+                var profileDto = new ProfileDto
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber
+                };
+
+                loggingService.LogInformation("Profile retrieved successfully for user: {UserId}, {FullName}, {Email}",
+                    user.Id, user.FullName, user.Email);
+                loggingService.LogUserAction("Profile Retrieved", userId, $"Profile data retrieved for {user.FullName}");
+
+                return Ok(ApiResult<ProfileDto>.Success(profileDto));
             }
-
-            loggingService.LogInformation("Fetching profile for user ID: {UserId}", userId);
-            var user = await userRepository.GetByIdAsync(userId);
-            if (user == null) 
+            catch (Exception ex)
             {
-                loggingService.LogWarning("User with ID {UserId} not found in database", userId);
-                return NotFound(ApiResult<ProfileDto>.Failure("User not found."));
+                loggingService.LogError("Error retrieving profile for user", ex);
+                return BadRequest(ApiResult<ProfileDto>.Failure($"Error: {ex.Message}"));
             }
-
-            // Manual mapping to avoid Mapperly issues
-            var profileDto = new ProfileDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber
-            };
-
-            loggingService.LogInformation("Profile retrieved successfully for user: {UserId}, {FullName}, {Email}", 
-                user.Id, user.FullName, user.Email);
-            loggingService.LogUserAction("Profile Retrieved", userId, $"Profile data retrieved for {user.FullName}");
-            
-            return Ok(ApiResult<ProfileDto>.Success(profileDto));
-        }
-        catch (Exception ex)
-        {
-            loggingService.LogError("Error retrieving profile for user", ex);
-            return BadRequest(ApiResult<ProfileDto>.Failure($"Error: {ex.Message}"));
         }
     }
-
-    [HttpGet("test/{email}")]
-    public async Task<ActionResult<ApiResult<User>>> TestUser(string email)
-    {
-        try
-        {
-            loggingService.LogInformation("Testing user lookup by email: {Email}", email);
-            var user = await userRepository.GetByCondition(u => u.Email == email).FirstOrDefaultAsync();
-            if (user == null)
-            {
-                loggingService.LogWarning("Test user not found by email: {Email}", email);
-                return NotFound(ApiResult<User>.Failure($"User with email {email} not found."));
-            }
-
-            loggingService.LogInformation("Test user found: Id={UserId}, FullName={FullName}, Email={Email}, IsDeleted={IsDeleted}", 
-                user.Id, user.FullName, user.Email, user.IsDeleted);
-            return Ok(ApiResult<User>.Success(user));
-        }
-        catch (Exception ex)
-        {
-            loggingService.LogError("Error in test user lookup by email: {Email}", ex, email);
-            return BadRequest(ApiResult<User>.Failure($"Error: {ex.Message}"));
-        }
-    }
-
     [HttpGet("test-id/{id}")]
     public async Task<ActionResult<ApiResult<User>>> TestUserById(int id)
     {
@@ -164,7 +140,7 @@ public class UserController(
                 return NotFound(ApiResult<User>.Failure($"User with ID {id} not found."));
             }
 
-            loggingService.LogInformation("Test user by ID found: Id={UserId}, FullName={FullName}, Email={Email}, IsDeleted={IsDeleted}", 
+            loggingService.LogInformation("Test user by ID found: Id={UserId}, FullName={FullName}, Email={Email}, IsDeleted={IsDeleted}",
                 user.Id, user.FullName, user.Email, user.IsDeleted);
             return Ok(ApiResult<User>.Success(user));
         }
@@ -174,29 +150,49 @@ public class UserController(
             return BadRequest(ApiResult<User>.Failure($"Error: {ex.Message}"));
         }
     }
-
     [HttpGet("test-auth")]
     public ActionResult<ApiResult<string>> TestAuth()
     {
         loggingService.LogInformation("=== TEST AUTH ENDPOINT CALLED ===");
         loggingService.LogInformation("User Identity: {Identity}", User?.Identity?.Name ?? "null");
         loggingService.LogInformation("Is Authenticated: {IsAuthenticated}", User?.Identity?.IsAuthenticated ?? false);
-        loggingService.LogInformation("Claims: {@Claims}", User?.Claims?.Select(c => new { c.Type, c.Value }).ToList() ?? new List<object>());
-        
+        loggingService.LogInformation("Claims: {@Claims}", User?.Claims?.Select(c => new { c.Type, c.Value }).ToList());
+
         return Ok(ApiResult<string>.Success("Test auth endpoint working"));
     }
-
     [HttpGet("test-no-auth")]
     [AllowAnonymous]
     public ActionResult<ApiResult<string>> TestNoAuth()
     {
         loggingService.LogInformation("=== TEST NO AUTH ENDPOINT CALLED ===");
-        loggingService.LogInformation("Request Headers: {@Headers}", 
+        loggingService.LogInformation("Request Headers: {@Headers}",
             Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()));
-        
+
         return Ok(ApiResult<string>.Success("Test no auth endpoint working"));
     }
+    [HttpGet("test/{email}")]
+    public async Task<ActionResult<ApiResult<User>>> TestUser(string email)
+    {
+        try
+        {
+            loggingService.LogInformation("Testing user lookup by email: {Email}", email);
+            var user = await userRepository.GetByCondition(u => u.Email == email).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                loggingService.LogWarning("Test user not found by email: {Email}", email);
+                return NotFound(ApiResult<User>.Failure($"User with email {email} not found."));
+            }
 
+            loggingService.LogInformation("Test user found: Id={UserId}, FullName={FullName}, Email={Email}, IsDeleted={IsDeleted}",
+                user.Id, user.FullName, user.Email, user.IsDeleted);
+            return Ok(ApiResult<User>.Success(user));
+        }
+        catch (Exception ex)
+        {
+            loggingService.LogError("Error in test user lookup by email: {Email}", ex, email);
+            return BadRequest(ApiResult<User>.Failure($"Error: {ex.Message}"));
+        }
+    }
     [HttpPost("test-generate-token")]
     [AllowAnonymous]
     public async Task<ActionResult<ApiResult<string>>> TestGenerateToken([FromBody] LoginRequestDto request)
@@ -205,12 +201,12 @@ public class UserController(
         {
             loggingService.LogInformation("=== TEST TOKEN GENERATION ===");
             loggingService.LogInformation("Generating token for email: {Email}", request.Email);
-            
+
             var authService = HttpContext.RequestServices.GetRequiredService<IAuthService>();
             var token = await authService.GenerateJwtTokenAsync(request.Email);
-            
+
             loggingService.LogInformation("Token generated successfully: {Token}", token);
-            
+
             return Ok(ApiResult<string>.Success(token));
         }
         catch (Exception ex)
@@ -220,4 +216,3 @@ public class UserController(
         }
     }
 }
-} 
