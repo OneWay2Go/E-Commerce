@@ -27,7 +27,6 @@ public class ProductController(
     }
 
     [HttpGet]
-    [PermissionAuthorize(Permission.Product_GetAll)]
     public ActionResult<ApiResult<IEnumerable<ProductDto>>> GetAll()
     {
         var entities = productRepository.GetAll().ToList();
@@ -36,7 +35,6 @@ public class ProductController(
     }
 
     [HttpGet("{id}")]
-    [PermissionAuthorize(Permission.Product_GetById)]
     public async Task<ActionResult<ApiResult<ProductDto>>> GetById(int id)
     {
         var entity = await productRepository.GetByIdAsync(id);

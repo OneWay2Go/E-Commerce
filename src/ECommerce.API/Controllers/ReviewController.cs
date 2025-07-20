@@ -27,7 +27,6 @@ public class ReviewController(
     }
 
     [HttpGet]
-    [PermissionAuthorize(Permission.Review_GetAll)]
     public ActionResult<ApiResult<IEnumerable<ReviewDto>>> GetAll()
     {
         var entities = reviewRepository.GetAll().ToList();

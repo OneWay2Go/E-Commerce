@@ -30,11 +30,10 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   password: string;
-  confirmPassword: string;
+  phoneNumber: string;
 }
 
 export interface LoginResponse {
@@ -44,7 +43,7 @@ export interface LoginResponse {
 }
 
 export interface RegisterResponse {
-  succeeded: boolean;
+  email: string;
   message: string;
 }
 

@@ -32,18 +32,17 @@ export const useAuthStore = create<AuthState>()(
           const result = await apiService.login(credentials);
           
           if (result.succeeded) {
-            const { accessToken, refreshToken } = result.data;
+            const { accessToken, refreshToken, role } = result.data;
             
-            // Store tokens in localStorage
-            localStorage.setItem('accessToken', accessToken);
+            // Store tokens in localStorage (already done in apiService)
             localStorage.setItem('refreshToken', refreshToken);
             
-            // For now, we'll create a mock user object
+            // Create a mock user object based on the login response
             // In a real app, you'd decode the JWT or fetch user info
             const mockUser: User = {
               id: 1,
-              firstName: 'John',
-              lastName: 'Doe',
+              firstName: credentials.email.split('@')[0], // Use email prefix as first name
+              lastName: '',
               email: credentials.email,
             };
             
@@ -62,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: any) {
           set({
             isLoading: false,
-            error: error.response?.data?.message || 'Login failed',
+            error: error.response?.data?.errors || error.message || 'Login failed',
           });
         }
       },
@@ -88,14 +87,13 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: any) {
           set({
             isLoading: false,
-            error: error.response?.data?.message || 'Registration failed',
+            error: error.response?.data?.errors || error.message || 'Registration failed',
           });
         }
       },
 
       logout: () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        apiService.clearAuthToken();
         
         set({
           user: null,

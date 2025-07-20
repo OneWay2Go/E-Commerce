@@ -27,7 +27,6 @@ public class CategoryController(
     }
 
     [HttpGet]
-    [PermissionAuthorize(Permission.Category_GetAll)]
     public ActionResult<ApiResult<IEnumerable<CategoryDto>>> GetAll()
     {
         var entities = categoryRepository.GetAll().ToList();
@@ -36,7 +35,6 @@ public class CategoryController(
     }
 
     [HttpGet("{id}")]
-    [PermissionAuthorize(Permission.Category_GetById)]
     public async Task<ActionResult<ApiResult<CategoryDto>>> GetById(int id)
     {
         var entity = await categoryRepository.GetByIdAsync(id);

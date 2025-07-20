@@ -14,11 +14,13 @@ import {
   Coupon,
   ShippingAddress,
 } from '@/types';
+import { mockApiService } from './mockData';
 
 class ApiService {
   private api: AxiosInstance;
   private authApi: AxiosInstance;
   private baseURL = 'https://e-commerce-nr8a.onrender.com';
+  private useMockData = false; // Set to true to force mock data
 
   constructor() {
     // Main API instance for /api/* endpoints
@@ -71,9 +73,31 @@ class ApiService {
     addAuthInterceptor(this.authApi);
   }
 
+  // Method to set auth token after login
+  setAuthToken(token: string) {
+    localStorage.setItem('accessToken', token);
+    // Update the default headers for both API instances
+    this.api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    this.authApi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+
+  // Method to clear auth token on logout
+  clearAuthToken() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    delete this.api.defaults.headers.common['Authorization'];
+    delete this.authApi.defaults.headers.common['Authorization'];
+  }
+
   // Authentication endpoints
   async login(credentials: LoginRequest): Promise<ApiResult<LoginResponse>> {
     const response: AxiosResponse<ApiResult<LoginResponse>> = await this.authApi.post('/auth/login', credentials);
+    
+    // If login successful, store the access token
+    if (response.data.succeeded && response.data.data.accessToken) {
+      this.setAuthToken(response.data.data.accessToken);
+    }
+    
     return response.data;
   }
 
@@ -82,15 +106,34 @@ class ApiService {
     return response.data;
   }
 
-  // Product endpoints
+  // Product endpoints with fallback to mock data
   async getProducts(): Promise<ApiResult<Product[]>> {
-    const response: AxiosResponse<ApiResult<Product[]>> = await this.api.get('/product');
-    return response.data;
+    if (this.useMockData) {
+      return mockApiService.getProducts();
+    }
+
+    try {
+      const response: AxiosResponse<ApiResult<Product[]>> = await this.api.get('/product');
+      return response.data;
+    } catch (error: any) {
+      console.warn('Real API failed, using mock data:', error.message);
+      return mockApiService.getProducts();
+    }
   }
 
   async getProduct(id: number): Promise<ApiResult<Product>> {
-    const response: AxiosResponse<ApiResult<Product>> = await this.api.get(`/product/${id}`);
-    return response.data;
+    try {
+      const response: AxiosResponse<ApiResult<Product>> = await this.api.get(`/product/${id}`);
+      return response.data;
+    } catch (error: any) {
+      // Fallback to mock data
+      const mockProducts = await mockApiService.getProducts();
+      const product = mockProducts.data.find(p => p.id === id);
+      if (product) {
+        return { succeeded: true, data: product, errors: "" };
+      }
+      throw error;
+    }
   }
 
   async createProduct(product: Omit<Product, 'id'>): Promise<ApiResult<Product>> {
@@ -108,15 +151,34 @@ class ApiService {
     return response.data;
   }
 
-  // Category endpoints
+  // Category endpoints with fallback to mock data
   async getCategories(): Promise<ApiResult<Category[]>> {
-    const response: AxiosResponse<ApiResult<Category[]>> = await this.api.get('/category');
-    return response.data;
+    if (this.useMockData) {
+      return mockApiService.getCategories();
+    }
+
+    try {
+      const response: AxiosResponse<ApiResult<Category[]>> = await this.api.get('/category');
+      return response.data;
+    } catch (error: any) {
+      console.warn('Real API failed, using mock data:', error.message);
+      return mockApiService.getCategories();
+    }
   }
 
   async getCategory(id: number): Promise<ApiResult<Category>> {
-    const response: AxiosResponse<ApiResult<Category>> = await this.api.get(`/category/${id}`);
-    return response.data;
+    try {
+      const response: AxiosResponse<ApiResult<Category>> = await this.api.get(`/category/${id}`);
+      return response.data;
+    } catch (error: any) {
+      // Fallback to mock data
+      const mockCategories = await mockApiService.getCategories();
+      const category = mockCategories.data.find(c => c.id === id);
+      if (category) {
+        return { succeeded: true, data: category, errors: "" };
+      }
+      throw error;
+    }
   }
 
   async createCategory(category: Omit<Category, 'id'>): Promise<ApiResult<Category>> {
