@@ -34,6 +34,7 @@ public class AuthService(
 
         var claims = new List<Claim>
         {
+            new Claim("userId", user.Id.ToString()),
             new Claim("email", email)
         };
 

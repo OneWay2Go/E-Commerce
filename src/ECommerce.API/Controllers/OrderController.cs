@@ -5,6 +5,9 @@ using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Auth;
+using Microsoft.AspNetCore.Authorization;
+using ECommerce.Infrastructure.Auth.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -12,7 +15,8 @@ namespace ECommerce.API.Controllers;
 [ApiController]
 public class OrderController(
     IOrderRepository orderRepository,
-    OrderMapper orderMapper
+    OrderMapper orderMapper,
+    AuthHelpers authHelpers
 ) : ControllerBase
 {
     [HttpPost]
@@ -72,5 +76,21 @@ public class OrderController(
         orderRepository.Update(entity);
         await orderRepository.SaveChangesAsync();
         return Ok(ApiResult<bool>.Success(true));
+    }
+
+    [HttpGet("my-orders")]
+    [Authorize]
+    public async Task<ActionResult<ApiResult<IEnumerable<OrderDto>>>> GetMyOrders()
+    {
+        var userId = authHelpers.GetCurrentUserId();
+        if (userId == -1)
+            return Unauthorized();
+
+        var orders = await orderRepository.GetAll()
+            .Where(o => o.UserId == userId && !o.IsDeleted)
+            .ToListAsync();
+
+        var dtos = orders.Select(orderMapper.ToDto).ToList();
+        return Ok(ApiResult<IEnumerable<OrderDto>>.Success(dtos));
     }
 } 

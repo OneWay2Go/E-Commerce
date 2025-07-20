@@ -19,6 +19,8 @@ builder.Services.AddApi(builder.Configuration)
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection("JwtOptions"));
 

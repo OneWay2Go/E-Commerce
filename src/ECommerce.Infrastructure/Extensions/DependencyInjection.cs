@@ -1,13 +1,11 @@
 using ECommerce.Application.Interfaces;
+using ECommerce.Infrastructure.Auth.Helpers;
 using ECommerce.Infrastructure.Persistence.Database;
 using ECommerce.Infrastructure.Persistence.Repositories;
 using ECommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ECommerce.Application.Models;
-using ECommerce.Infrastructure.Auth.Seeders;
-using System.Threading.Tasks;
 
 namespace ECommerce.Infrastructure.Extensions;
 
@@ -48,6 +46,8 @@ public static class DependencyInjection
         services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 
         services.AddScoped<EmailService>();
+
+        services.AddScoped<AuthHelpers>();
 
         return services;
     }

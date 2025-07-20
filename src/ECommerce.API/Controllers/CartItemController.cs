@@ -5,6 +5,10 @@ using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Auth;
+using ECommerce.Infrastructure.Auth.Helpers;
+using Microsoft.EntityFrameworkCore;
+using ECommerce.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerce.API.Controllers;
 
@@ -12,7 +16,9 @@ namespace ECommerce.API.Controllers;
 [ApiController]
 public class CartItemController(
     ICartItemRepository cartItemRepository,
-    CartItemMapper cartItemMapper
+    CartItemMapper cartItemMapper,
+    ICartRepository cartRepository,
+    AuthHelpers authHelpers
 ) : ControllerBase
 {
     [HttpPost]
@@ -71,6 +77,100 @@ public class CartItemController(
         // No IsDeleted property, so perform hard delete
         cartItemRepository.Delete(entity);
         await cartItemRepository.SaveChangesAsync();
+        return Ok(ApiResult<bool>.Success(true));
+    }
+
+    [HttpPost("add-to-cart")]
+    [Authorize]
+    public async Task<ActionResult<ApiResult<CartItemDto>>> AddCartItemToCart([FromBody]CartItemDto request)
+    {
+        var userId = authHelpers.GetCurrentUserId();
+        if (userId == -1)
+            return Unauthorized();
+
+        var cart = await cartRepository.GetAll()
+            .FirstOrDefaultAsync(c => c.UserId == userId && !c.IsDeleted);
+
+        if (cart == null)
+        {
+            cart = new Cart { UserId = userId };
+            await cartRepository.AddAsync(cart);
+            await cartRepository.SaveChangesAsync();
+        }
+
+        var existingItem = await cartItemRepository.GetAll()
+            .FirstOrDefaultAsync(ci => ci.CartId == cart.Id && ci.ProductId == request.ProductId);
+
+        if(existingItem != null)
+        {
+            existingItem.Quantity += request.Quantity;
+            cartItemRepository.Update(existingItem);
+        }
+        else
+        {
+            var newItem = new CartItem
+            {
+                CartId = cart.Id,
+                ProductId = request.ProductId,
+                Quantity = request.Quantity
+            };
+            await cartItemRepository.AddAsync(newItem);
+        }
+        await cartItemRepository.SaveChangesAsync();
+
+        var updatedItem = await cartItemRepository.GetAll()
+            .FirstOrDefaultAsync(ci => ci.CartId == cart.Id && ci.ProductId == request.ProductId);
+        
+        var dto = cartItemMapper.ToDto(updatedItem);
+        return Ok(ApiResult<CartItemDto>.Success(dto));
+    }
+
+    [HttpPut("update-quantity")]
+    [Authorize]
+    public async Task<ActionResult<ApiResult<CartItemDto>>> UpdateQuantity([FromBody]CartItemDto request)
+    {
+        var userId = authHelpers.GetCurrentUserId();
+        if(userId == -1) 
+            return Unauthorized();
+
+        var existingCart = await cartRepository.GetByCondition(c => c.UserId == userId && !c.IsDeleted)
+            .FirstOrDefaultAsync();
+        if (existingCart == null)
+            return NotFound(ApiResult<CartItemDto>.Failure("Cart to add item is not found."));
+
+        var existingCartItem = await cartItemRepository.GetByCondition(c => c.CartId == existingCart.Id && c.ProductId == request.ProductId)
+            .FirstOrDefaultAsync();
+        if (existingCartItem == null)
+            return NotFound(ApiResult<CartItemDto>.Failure("Cart item is not found."));
+
+        existingCartItem.Quantity += request.Quantity;
+
+        cartItemRepository.Update(existingCartItem);
+        await cartItemRepository.SaveChangesAsync();
+
+        var dto = cartItemMapper.ToDto(existingCartItem);
+        return Ok(ApiResult<CartItemDto>.Success(dto));
+    }
+
+    [HttpDelete("remove/{itemId}")]
+    public async Task<ActionResult<ApiResult<bool>>> RemoveItemFromCart(int itemId)
+    {
+        var userId = authHelpers.GetCurrentUserId();
+        if (userId == -1)
+            return Unauthorized();
+
+        var existingCartItem = await cartItemRepository.GetByIdAsync(itemId);
+        if (existingCartItem == null)
+            return NotFound();
+
+        var existingCart = await cartRepository.GetByCondition(c => c.UserId == userId && c.Id == existingCartItem.CartId && !c.IsDeleted)
+            .FirstOrDefaultAsync();
+        if (existingCart == null)
+            return Forbid();
+
+        cartItemRepository.Delete(existingCartItem);
+        await cartItemRepository.SaveChangesAsync();
+
         return Ok(ApiResult<bool>.Success(true));
     }
 } 

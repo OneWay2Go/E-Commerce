@@ -5,6 +5,9 @@ using ECommerce.Application.Models;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Auth;
+using Microsoft.AspNetCore.Authorization;
+using ECommerce.Infrastructure.Auth.Helpers;
+using ECommerce.Domain.Entities.Auth;
 
 namespace ECommerce.API.Controllers;
 
@@ -12,11 +15,12 @@ namespace ECommerce.API.Controllers;
 [ApiController]
 public class UserController(
     IUserRepository userRepository,
-    UserMapper userMapper
+    UserMapper userMapper,
+    AuthHelpers authHelpers
 ) : ControllerBase
 {
     [HttpPost]
-    [PermissionAuthorize(Permission.User_Create)]
+    [PermissionAuthorize(Domain.Enums.Permission.User_Create)]
     public async Task<ActionResult<ApiResult<UserDto>>> Create([FromBody] UserDto dto)
     {
         var entity = userMapper.ToEntity(dto);
@@ -27,7 +31,7 @@ public class UserController(
     }
 
     [HttpGet]
-    [PermissionAuthorize(Permission.User_GetAll)]
+    [PermissionAuthorize(Domain.Enums.Permission.User_GetAll)]
     public ActionResult<ApiResult<IEnumerable<UserDto>>> GetAll()
     {
         var entities = userRepository.GetAll().ToList();
@@ -36,7 +40,7 @@ public class UserController(
     }
 
     [HttpGet("{id}")]
-    [PermissionAuthorize(Permission.User_GetById)]
+    [PermissionAuthorize(Domain.Enums.Permission.User_GetById)]
     public async Task<ActionResult<ApiResult<UserDto>>> GetById(int id)
     {
         var entity = await userRepository.GetByIdAsync(id);
@@ -47,7 +51,7 @@ public class UserController(
     }
 
     [HttpPut("{id}")]
-    [PermissionAuthorize(Permission.User_Update)]
+    [PermissionAuthorize(Domain.Enums.Permission.User_Update)]
     public async Task<ActionResult<ApiResult<UserDto>>> Update(int id, [FromBody] UserDto dto)
     {
         var entity = await userRepository.GetByIdAsync(id);
@@ -62,7 +66,7 @@ public class UserController(
     }
 
     [HttpDelete("{id}")]
-    [PermissionAuthorize(Permission.User_Delete)]
+    [PermissionAuthorize(Domain.Enums.Permission.User_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await userRepository.GetByIdAsync(id);
@@ -72,5 +76,20 @@ public class UserController(
         userRepository.Update(entity);
         await userRepository.SaveChangesAsync();
         return Ok(ApiResult<bool>.Success(true));
+    }
+
+    [HttpGet("profile")]
+    [Authorize]
+    public async Task<ActionResult<ApiResult<User>>> GetProfile()
+    {
+        var userId = authHelpers.GetCurrentUserId();
+        if (userId == -1)
+            return ApiResult<User>.Failure("Unauthorized.");
+
+        var user = await userRepository.GetByIdAsync(userId);
+        if (user == null) 
+            return ApiResult<User>.Failure("User not found.");
+
+        return Ok(ApiResult<User>.Success(user));
     }
 } 

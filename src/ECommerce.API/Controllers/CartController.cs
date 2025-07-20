@@ -1,10 +1,15 @@
 using ECommerce.Application.Interfaces;
-using ECommerce.Application.Models.DTOs;
 using ECommerce.Application.Mappers;
 using ECommerce.Application.Models;
-using Microsoft.AspNetCore.Mvc;
+using ECommerce.Application.Models.DTOs;
+using ECommerce.Domain.Entities;
+using ECommerce.Domain.Entities.Auth;
 using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Auth;
+using ECommerce.Infrastructure.Auth.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.API.Controllers;
 
@@ -12,11 +17,12 @@ namespace ECommerce.API.Controllers;
 [ApiController]
 public class CartController(
     ICartRepository cartRepository,
-    CartMapper cartMapper
+    CartMapper cartMapper,
+    AuthHelpers authHelpers
 ) : ControllerBase
 {
     [HttpPost]
-    [PermissionAuthorize(Permission.Cart_Create)]
+    [PermissionAuthorize(Domain.Enums.Permission.Cart_Create)]
     public async Task<ActionResult<ApiResult<CartDto>>> Create([FromBody] CartDto dto)
     {
         var entity = cartMapper.ToEntity(dto);
@@ -27,7 +33,7 @@ public class CartController(
     }
 
     [HttpGet]
-    [PermissionAuthorize(Permission.Cart_GetAll)]
+    [PermissionAuthorize(Domain.Enums.Permission.Cart_GetAll)]
     public ActionResult<ApiResult<IEnumerable<CartDto>>> GetAll()
     {
         var entities = cartRepository.GetAll().ToList();
@@ -36,7 +42,7 @@ public class CartController(
     }
 
     [HttpGet("{id}")]
-    [PermissionAuthorize(Permission.Cart_GetById)]
+    [PermissionAuthorize(Domain.Enums.Permission.Cart_GetById)]
     public async Task<ActionResult<ApiResult<CartDto>>> GetById(int id)
     {
         var entity = await cartRepository.GetByIdAsync(id);
@@ -47,7 +53,7 @@ public class CartController(
     }
 
     [HttpPut("{id}")]
-    [PermissionAuthorize(Permission.Cart_Update)]
+    [PermissionAuthorize(Domain.Enums.Permission.Cart_Update)]
     public async Task<ActionResult<ApiResult<CartDto>>> Update(int id, [FromBody] CartDto dto)
     {
         var entity = await cartRepository.GetByIdAsync(id);
@@ -62,7 +68,7 @@ public class CartController(
     }
 
     [HttpDelete("{id}")]
-    [PermissionAuthorize(Permission.Cart_Delete)]
+    [PermissionAuthorize(Domain.Enums.Permission.Cart_Delete)]
     public async Task<ActionResult<ApiResult<bool>>> Delete(int id)
     {
         var entity = await cartRepository.GetByIdAsync(id);
@@ -72,5 +78,23 @@ public class CartController(
         cartRepository.Update(entity);
         await cartRepository.SaveChangesAsync();
         return Ok(ApiResult<bool>.Success(true));
+    }
+
+    [HttpGet("my-cart")]
+    [Authorize]
+    public async Task<ActionResult<ApiResult<Cart>>> GetMyCart()
+    {
+        var userId = authHelpers.GetCurrentUserId();
+        if (userId == -1)
+            return ApiResult<Cart>.Failure("Unauthorized.");
+
+        var cart = await cartRepository.GetByCondition(c => c.UserId == userId)
+            .Include(c => c.CartItems)
+            .ThenInclude(ci => ci.Product)
+            .FirstOrDefaultAsync();
+        if (cart == null)
+            return ApiResult<Cart>.Failure("Cart not found.");
+
+        return Ok(ApiResult<Cart>.Success(cart));
     }
 } 

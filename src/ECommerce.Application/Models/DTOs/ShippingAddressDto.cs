@@ -2,7 +2,6 @@ namespace ECommerce.Application.Models.DTOs;
 
 public class ShippingAddressDto
 {
-    public int Id { get; set; }
     public int UserId { get; set; }
     public string FullName { get; set; }
     public string Street { get; set; }
