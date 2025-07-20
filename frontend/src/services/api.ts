@@ -106,34 +106,15 @@ class ApiService {
     return response.data;
   }
 
-  // Product endpoints with fallback to mock data
+  // Product endpoints - now public!
   async getProducts(): Promise<ApiResult<Product[]>> {
-    if (this.useMockData) {
-      return mockApiService.getProducts();
-    }
-
-    try {
-      const response: AxiosResponse<ApiResult<Product[]>> = await this.api.get('/product');
-      return response.data;
-    } catch (error: any) {
-      console.warn('Real API failed, using mock data:', error.message);
-      return mockApiService.getProducts();
-    }
+    const response: AxiosResponse<ApiResult<Product[]>> = await this.api.get('/product');
+    return response.data;
   }
 
   async getProduct(id: number): Promise<ApiResult<Product>> {
-    try {
-      const response: AxiosResponse<ApiResult<Product>> = await this.api.get(`/product/${id}`);
-      return response.data;
-    } catch (error: any) {
-      // Fallback to mock data
-      const mockProducts = await mockApiService.getProducts();
-      const product = mockProducts.data.find(p => p.id === id);
-      if (product) {
-        return { succeeded: true, data: product, errors: "" };
-      }
-      throw error;
-    }
+    const response: AxiosResponse<ApiResult<Product>> = await this.api.get(`/product/${id}`);
+    return response.data;
   }
 
   async createProduct(product: Omit<Product, 'id'>): Promise<ApiResult<Product>> {
@@ -151,34 +132,15 @@ class ApiService {
     return response.data;
   }
 
-  // Category endpoints with fallback to mock data
+  // Category endpoints - now public!
   async getCategories(): Promise<ApiResult<Category[]>> {
-    if (this.useMockData) {
-      return mockApiService.getCategories();
-    }
-
-    try {
-      const response: AxiosResponse<ApiResult<Category[]>> = await this.api.get('/category');
-      return response.data;
-    } catch (error: any) {
-      console.warn('Real API failed, using mock data:', error.message);
-      return mockApiService.getCategories();
-    }
+    const response: AxiosResponse<ApiResult<Category[]>> = await this.api.get('/category');
+    return response.data;
   }
 
   async getCategory(id: number): Promise<ApiResult<Category>> {
-    try {
-      const response: AxiosResponse<ApiResult<Category>> = await this.api.get(`/category/${id}`);
-      return response.data;
-    } catch (error: any) {
-      // Fallback to mock data
-      const mockCategories = await mockApiService.getCategories();
-      const category = mockCategories.data.find(c => c.id === id);
-      if (category) {
-        return { succeeded: true, data: category, errors: "" };
-      }
-      throw error;
-    }
+    const response: AxiosResponse<ApiResult<Category>> = await this.api.get(`/category/${id}`);
+    return response.data;
   }
 
   async createCategory(category: Omit<Category, 'id'>): Promise<ApiResult<Category>> {
@@ -266,10 +228,11 @@ class ApiService {
     return response.data;
   }
 
-  async validateCoupon(code: string): Promise<ApiResult<Coupon>> {
-    const response: AxiosResponse<ApiResult<Coupon>> = await this.api.get(`/coupon/validate/${code}`);
-    return response.data;
-  }
+  // Note: Coupon validation endpoint doesn't exist in the backend
+  // async validateCoupon(code: string): Promise<ApiResult<Coupon>> {
+  //   const response: AxiosResponse<ApiResult<Coupon>> = await this.api.get(`/coupon/validate/${code}`);
+  //   return response.data;
+  // }
 
   // Shipping Address endpoints
   async getShippingAddresses(): Promise<ApiResult<ShippingAddress[]>> {
