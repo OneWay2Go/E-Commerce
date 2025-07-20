@@ -158,24 +158,40 @@ class ApiService {
     return response.data;
   }
 
+  // User Profile endpoints
+  async getUserProfile(): Promise<ApiResult<any>> {
+    const response: AxiosResponse<ApiResult<any>> = await this.api.get('/user/profile');
+    return response.data;
+  }
+
+  async updateUserProfile(userData: any): Promise<ApiResult<any>> {
+    const response: AxiosResponse<ApiResult<any>> = await this.api.put('/user/profile', userData);
+    return response.data;
+  }
+
   // Cart endpoints
+  async getMyCart(): Promise<ApiResult<any>> {
+    const response: AxiosResponse<ApiResult<any>> = await this.api.get('/cart/my-cart');
+    return response.data;
+  }
+
   async getCartItems(): Promise<ApiResult<CartItem[]>> {
     const response: AxiosResponse<ApiResult<CartItem[]>> = await this.api.get('/cartitem');
     return response.data;
   }
 
   async addToCart(cartItem: Omit<CartItem, 'id'>): Promise<ApiResult<CartItem>> {
-    const response: AxiosResponse<ApiResult<CartItem>> = await this.api.post('/cartitem', cartItem);
+    const response: AxiosResponse<ApiResult<CartItem>> = await this.api.post('/cartitem/add-to-cart', cartItem);
     return response.data;
   }
 
-  async updateCartItem(id: number, cartItem: Omit<CartItem, 'id'>): Promise<ApiResult<CartItem>> {
-    const response: AxiosResponse<ApiResult<CartItem>> = await this.api.put(`/cartitem/${id}`, cartItem);
+  async updateCartItemQuantity(cartItem: Omit<CartItem, 'id'>): Promise<ApiResult<CartItem>> {
+    const response: AxiosResponse<ApiResult<CartItem>> = await this.api.put('/cartitem/update-quantity', cartItem);
     return response.data;
   }
 
   async removeFromCart(id: number): Promise<ApiResult<boolean>> {
-    const response: AxiosResponse<ApiResult<boolean>> = await this.api.delete(`/cartitem/${id}`);
+    const response: AxiosResponse<ApiResult<boolean>> = await this.api.delete(`/cartitem/remove/${id}`);
     return response.data;
   }
 
@@ -207,6 +223,11 @@ class ApiService {
   }
 
   // Order endpoints
+  async getMyOrders(): Promise<ApiResult<Order[]>> {
+    const response: AxiosResponse<ApiResult<Order[]>> = await this.api.get('/order/my-orders');
+    return response.data;
+  }
+
   async getOrders(): Promise<ApiResult<Order[]>> {
     const response: AxiosResponse<ApiResult<Order[]>> = await this.api.get('/order');
     return response.data;

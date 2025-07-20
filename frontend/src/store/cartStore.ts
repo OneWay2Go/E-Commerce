@@ -92,7 +92,7 @@ export const useCartStore = create<CartState>()(
             quantity,
           };
           
-          const result = await apiService.updateCartItem(itemId, updatedCartItem);
+          const result = await apiService.updateCartItemQuantity(updatedCartItem);
           
           if (result.succeeded) {
             set(state => ({

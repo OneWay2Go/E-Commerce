@@ -4,19 +4,16 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HomePage from '@/pages/HomePage';
 import ProductsPage from '@/pages/ProductsPage';
+import ProductDetailsPage from '@/pages/ProductDetailsPage';
 import CategoriesPage from '@/pages/CategoriesPage';
+import CartPage from '@/pages/CartPage';
+import ProfilePage from '@/pages/ProfilePage';
+import OrdersPage from '@/pages/OrdersPage';
+import WishlistPage from '@/pages/WishlistPage';
 import LoginForm from '@/components/LoginForm';
 import RegisterForm from '@/components/RegisterForm';
 import AuthDemo from '@/components/AuthDemo';
 import ApiTest from '@/components/ApiTest';
-
-// Placeholder components for other routes
-const CartPage = () => (
-  <div className="container mx-auto px-4 py-8">
-    <h1 className="text-3xl font-bold">Shopping Cart</h1>
-    <p className="text-gray-600 mt-4">This page will display cart items and checkout functionality.</p>
-  </div>
-);
 
 const NotFoundPage = () => (
   <div className="container mx-auto px-4 py-16 text-center">
@@ -41,8 +38,12 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:id" element={<ProductDetailsPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/orders" element={<OrdersPage />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/auth-demo" element={<AuthDemo />} />
