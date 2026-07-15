@@ -50,7 +50,7 @@ public static class DependencyInjection
         services.AddScoped<AuthHelpers>();
 
         // Register logging service
-        services.AddScoped<ILoggingService, LoggingService>();
+        services.AddSingleton<ILoggingService, LoggingService>();
 
         return services;
     }
